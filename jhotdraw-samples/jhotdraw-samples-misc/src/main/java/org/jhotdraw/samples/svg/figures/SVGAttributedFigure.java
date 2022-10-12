@@ -7,19 +7,24 @@
  */
 package org.jhotdraw.samples.svg.figures;
 
+import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.figure.AbstractAttributedFigure;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.util.*;
+import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.util.ResourceBundleUtil;
+
 import javax.swing.*;
-import org.jhotdraw.draw.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import static org.jhotdraw.draw.AttributeKeys.STROKE_WIDTH;
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
-import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
-import org.jhotdraw.util.*;
+import static org.jhotdraw.samples.svg.SVGAttributeKeys.OPACITY;
 
 /**
  * SVGAttributedFigure.
@@ -37,7 +42,6 @@ public abstract class SVGAttributedFigure extends AbstractAttributedFigure {
     public SVGAttributedFigure() {
     }
 
-    @Override
     public void draw(Graphics2D g) {
         double opacity = get(OPACITY);
         opacity = Math.min(Math.max(0d, opacity), 1d);
