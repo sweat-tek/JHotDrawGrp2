@@ -64,7 +64,7 @@ public class SVGTextFigure
     /**
      * Creates a new instance.
      */
-    @FeatureEntryPoint("TextConstructor")
+    @FeatureEntryPoint("TextConstructor1")
     public SVGTextFigure() {
         this("Text");
     }
