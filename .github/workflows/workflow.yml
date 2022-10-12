@@ -1,0 +1,41 @@
+name: MVN Build and Test
+
+on: [push]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "adopt"
+      - name: Build with Maven
+        run: mvn clean compile --batch-mode --update-snapshots package
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: "11"
+          distribution: "adopt"
+      - name: Test with Maven
+        run: mvn clean install test --batch-mode --update-snapshots package
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
