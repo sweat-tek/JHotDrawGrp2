@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.samples.svg.figures;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.figure.TextHolderFigure;
 import java.awt.*;
 import java.awt.font.*;
@@ -62,10 +63,12 @@ public class SVGTextAreaFigure extends SVGAttributedFigure
     /**
      * Creates a new instance.
      */
+    @FeatureEntryPoint("TextAreaConstructor1")
     public SVGTextAreaFigure() {
         this("Text");
     }
 
+    @FeatureEntryPoint("TextAreaConstructor2")
     public SVGTextAreaFigure(String text) {
         setText(text);
         SVGAttributeKeys.setDefaults(this);
