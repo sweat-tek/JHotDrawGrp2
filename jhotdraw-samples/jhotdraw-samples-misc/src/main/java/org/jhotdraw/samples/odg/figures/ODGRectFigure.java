@@ -156,6 +156,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     }
 
     private Shape getHitShape() {
+
+
         if (cachedHitShape == null) {
             cachedHitShape = new GrowStroke(
                     (float) ODGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
