@@ -16,7 +16,6 @@ import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
 import org.jhotdraw.samples.adapter.SharedAdapter;
-import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import org.jhotdraw.samples.util.EllipseUtil;
 import org.jhotdraw.samples.util.SharedUtil;

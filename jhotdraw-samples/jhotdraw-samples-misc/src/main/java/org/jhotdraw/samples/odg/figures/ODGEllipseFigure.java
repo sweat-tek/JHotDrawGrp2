@@ -8,19 +8,21 @@
 package org.jhotdraw.samples.odg.figures;
 
 import org.jhotdraw.draw.figure.ConnectionFigure;
+
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.*;
+
 import org.jhotdraw.draw.*;
+
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+
 import org.jhotdraw.draw.connector.Connector;
-import org.jhotdraw.draw.figure.EllipseFigure;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
-import org.jhotdraw.samples.odg.Gradient;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
 import org.jhotdraw.samples.util.EllipseUtil;
 
@@ -160,10 +162,10 @@ public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, 
     @Override
     public Object getTransformRestoreData() {
         return new Object[]{
-            ellipse.clone(),
-            TRANSFORM.getClone(this),
-            FILL_GRADIENT.getClone(this),
-            STROKE_GRADIENT.getClone(this)};
+                ellipse.clone(),
+                TRANSFORM.getClone(this),
+                FILL_GRADIENT.getClone(this),
+                STROKE_GRADIENT.getClone(this)};
     }
 
     // ATTRIBUTES
