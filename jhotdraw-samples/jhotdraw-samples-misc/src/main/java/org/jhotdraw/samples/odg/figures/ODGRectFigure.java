@@ -23,8 +23,11 @@ import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.odg.Gradient;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
+import org.jhotdraw.samples.util.RectUtil;
+
 import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
 
 /**
@@ -33,10 +36,16 @@ import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
+public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, RectangleAdapter {
 
     private static final long serialVersionUID = 1L;
     private RoundRectangle2D.Double roundrect;
+
+    @Override
+    public void setRoundrect(RoundRectangle2D.Double roundrect) {
+        this.roundrect = roundrect;
+    }
+
     /**
      * This is used to perform faster drawing.
      */
@@ -45,6 +54,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
      * This is used to perform faster hit testing.
      */
     private transient Shape cachedHitShape;
+
+    private final RectUtil rectUtil;
 
     /**
      * Creates a new instance.
@@ -59,6 +70,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
 
     public ODGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
+        this.rectUtil = new RectUtil();
         ODGAttributeKeys.setDefaults(this);
     }
 
@@ -150,26 +162,19 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
         roundrect.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
     }
 
-    private Shape getTransformedShape() {
-        if (cachedTransformedShape == null) {
-            if (getArcHeight() == 0 || getArcWidth() == 0) {
-                cachedTransformedShape = roundrect.getBounds2D();
-            } else {
-                cachedTransformedShape = (Shape) roundrect.clone();
-            }
-            if (get(TRANSFORM) != null) {
-                cachedTransformedShape = get(TRANSFORM).createTransformedShape(cachedTransformedShape);
-            }
-        }
-        return cachedTransformedShape;
+    public Shape getTransformedShape() {
+        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this );
     }
 
     private Shape getHitShape() {
+
+
+
         if (cachedHitShape == null) {
             cachedHitShape = new GrowStroke(
                     (float) ODGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
@@ -236,12 +241,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure {
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        invalidateTransformedShape();
-        Object[] restoreData = (Object[]) geometry;
-        roundrect = (RoundRectangle2D.Double) ((RoundRectangle2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
+        rectUtil.restoreTransformTo(geometry, this, this);
     }
 
     @Override

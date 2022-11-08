@@ -14,9 +14,11 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.util.RectUtil;
+import org.jhotdraw.samples.util.SharedUtil;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -33,7 +35,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
+public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, RectangleAdapter {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -59,6 +61,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
         ACV = (1.0 - cv);
     }
 
+    public void setRoundrect(RoundRectangle2D.Double roundrect) {
+        this.roundrect = roundrect;
+    }
+
     /**
      *
      */
@@ -71,6 +77,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
      * This is used to perform faster hit testing.
      */
     private transient Shape cachedHitShape;
+
+    private final RectUtil rectUtil;
+
+    private final SharedUtil sharedUtil;
 
     /**
      * Creates a new instance.
@@ -86,6 +96,8 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @FeatureEntryPoint(value = "RectangleConstructor")
     public SVGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
+        this.rectUtil = new RectUtil();
+        this.sharedUtil = new SharedUtil();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -265,36 +277,17 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
         invalidate();
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
     }
 
-    private Shape getTransformedShape() {
-        if (cachedTransformedShape == null) {
-            if (getArcHeight() == 0 || getArcWidth() == 0) {
-                cachedTransformedShape = roundrect.getBounds2D();
-            } else {
-                cachedTransformedShape = (Shape) roundrect.clone();
-            }
-            if (get(TRANSFORM) != null) {
-                cachedTransformedShape = get(TRANSFORM).createTransformedShape(cachedTransformedShape);
-            }
-        }
-        return cachedTransformedShape;
+    public Shape getTransformedShape() {
+        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this);
     }
 
     private Shape getHitShape() {
-        if (cachedHitShape == null) {
-            if (get(FILL_COLOR) != null || get(FILL_GRADIENT) != null) {
-                cachedHitShape = new GrowStroke(
-                        (float) SVGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
-                        (float) SVGAttributeKeys.getStrokeTotalMiterLimit(this, 1.0)).createStrokedShape(getTransformedShape());
-            } else {
-                cachedHitShape = SVGAttributeKeys.getHitStroke(this, 1.0).createStrokedShape(getTransformedShape());
-            }
-        }
-        return cachedHitShape;
+        return sharedUtil.getHitShape(cachedHitShape, this, this);
     }
 
     /**
@@ -306,9 +299,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @Override
     public void transform(AffineTransform tx) {
         invalidateTransformedShape();
-        if (get(TRANSFORM) != null
-                || //              (tx.getType() & (AffineTransform.TYPE_TRANSLATION | AffineTransform.TYPE_MASK_SCALE)) != tx.getType()) {
-                (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
+        if (get(TRANSFORM) != null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
             if (get(TRANSFORM) == null) {
                 set(TRANSFORM, (AffineTransform) tx.clone());
             } else {
