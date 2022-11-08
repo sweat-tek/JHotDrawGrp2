@@ -6,6 +6,7 @@ import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
@@ -44,5 +45,14 @@ public class EllipseUtil {
             }
         }
         ellipseFigure.invalidate();
+    }
+
+    public void restoreTransformTo(Object geometry, EllipseFigureAdapter ellipseFigureAdapter, Ellipse2D.Double ellipse) {
+        Object[] restoreData = (Object[]) geometry;
+        ellipse = (Ellipse2D.Double) ((Ellipse2D.Double) restoreData[0]).clone();
+        TRANSFORM.setClone((Figure) ellipseFigureAdapter, (AffineTransform) restoreData[1]);
+        FILL_GRADIENT.setClone((Figure) ellipseFigureAdapter, (Gradient) restoreData[2]);
+        STROKE_GRADIENT.setClone((Figure) ellipseFigureAdapter, (Gradient) restoreData[3]);
+        ellipseFigureAdapter.invalidate();
     }
 }

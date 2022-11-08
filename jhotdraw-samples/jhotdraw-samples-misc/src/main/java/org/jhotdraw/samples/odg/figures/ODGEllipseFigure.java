@@ -154,12 +154,7 @@ public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, 
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        Object[] restoreData = (Object[]) geometry;
-        ellipse = (Ellipse2D.Double) ((Ellipse2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
-        invalidate();
+        ellipseUtil.restoreTransformTo(geometry, this, ellipse);
     }
 
     @Override

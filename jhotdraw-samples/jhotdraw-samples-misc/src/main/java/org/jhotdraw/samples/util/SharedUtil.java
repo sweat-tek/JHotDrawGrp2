@@ -22,6 +22,7 @@ public class SharedUtil {
                 cachedHitShape = SVGAttributeKeys.getHitStroke(figure, 1.0).createStrokedShape(sharedAdapter.getTransformedShape());
             }
         }
+
         return cachedHitShape;
     }
 }
