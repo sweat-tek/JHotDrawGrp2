@@ -2,7 +2,6 @@ package org.jhotdraw.draw.text;
 
 import org.jhotdraw.draw.figure.TextHolderFigure;
 import org.jhotdraw.util.ResourceBundleUtil;
-
 import javax.swing.undo.AbstractUndoableEdit;
 
 public class UndoableTextEdit extends AbstractUndoableEdit {
