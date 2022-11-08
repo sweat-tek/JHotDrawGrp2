@@ -9,11 +9,13 @@ package org.jhotdraw.samples.svg.io;
 
 import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.figure.CompositeFigure;
+
 import java.awt.Color;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import javax.swing.text.*;
+
 import org.jhotdraw.draw.*;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.samples.svg.Gradient;
@@ -44,7 +46,7 @@ public class DefaultSVGFigureFactory implements SVGFigureFactory {
 
     @Override
     public Figure createRect(double x, double y, double w, double h, double rx, double ry, Map<AttributeKey<?>, Object> a) {
-        SVGRectFigure figure = new SVGRectFigure();
+        SVGRectFigure figure = SVGRectFigure.newDefaultRectangle();
         figure.setBounds(new Point2D.Double(x, y), new Point2D.Double(x + w, y + h));
         figure.setArc(rx, ry);
         figure.setAttributes(a);

@@ -7,26 +7,29 @@
  */
 package org.jhotdraw.samples.svg.figures;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
-
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
-import org.jhotdraw.draw.*;
-import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
-import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.geom.GrowStroke;
-import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
+import org.jhotdraw.samples.adapter.SharedAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import org.jhotdraw.samples.util.EllipseUtil;
+import org.jhotdraw.samples.util.SharedUtil;
 
-import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Collection;
+import java.util.LinkedList;
+
+import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
+import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
 /**
  * SVGEllipse represents a SVG ellipse and a SVG circle element.
@@ -34,7 +37,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-    public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, EllipseFigureAdapter {
+public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, SharedAdapter {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
@@ -47,7 +50,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
      */
     private transient Shape cachedHitShape;
 
-    private EllipseUtil ellipseUtil = new EllipseUtil();
+    private final SharedUtil sharedUtil;
 
     /**
      * Creates a new instance.
@@ -59,6 +62,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
+        this.sharedUtil = new SharedUtil();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -124,7 +128,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
         return getHitShape().contains(p);
     }
 
-    private Shape getTransformedShape() {
+    public Shape getTransformedShape() {
         if (cachedTransformedShape == null) {
             if (get(TRANSFORM) == null) {
                 cachedTransformedShape = ellipse;
@@ -136,16 +140,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
     }
 
     private Shape getHitShape() {
-        if (cachedHitShape == null) {
-            if (get(FILL_COLOR) != null || get(FILL_GRADIENT) != null) {
-                cachedHitShape = new GrowStroke(
-                        (float) SVGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
-                        (float) SVGAttributeKeys.getStrokeTotalMiterLimit(this, 1.0)).createStrokedShape(getTransformedShape());
-            } else {
-                cachedHitShape = SVGAttributeKeys.getHitStroke(this, 1.0).createStrokedShape(getTransformedShape());
-            }
-        }
-        return cachedHitShape;
+        return sharedUtil.getHitShape(cachedHitShape, this, this);
     }
 
     @Override
@@ -165,7 +160,35 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
     @Override
     @FeatureEntryPoint("EllipseTransform")
     public void transform(AffineTransform tx) {
-        ellipseUtil.transform(tx, this, this);
+        if (get(TRANSFORM) != null
+                || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
+            if (get(TRANSFORM) == null) {
+                TRANSFORM.setClone(this, tx);
+            } else {
+                AffineTransform t = TRANSFORM.getClone(this);
+                t.preConcatenate(tx);
+                set(TRANSFORM, t);
+            }
+        } else {
+            Point2D.Double anchor = getStartPoint();
+            Point2D.Double lead = getEndPoint();
+            setBounds(
+                    (Point2D.Double) tx.transform(anchor, anchor),
+                    (Point2D.Double) tx.transform(lead, lead));
+            if (get(FILL_GRADIENT) != null
+                    && !get(FILL_GRADIENT).isRelativeToFigureBounds()) {
+                Gradient g = FILL_GRADIENT.getClone(this);
+                g.transform(tx);
+                set(FILL_GRADIENT, g);
+            }
+            if (get(STROKE_GRADIENT) != null
+                    && !get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
+                Gradient g = STROKE_GRADIENT.getClone(this);
+                g.transform(tx);
+                set(STROKE_GRADIENT, g);
+            }
+        }
+        invalidate();
     }
 
     @Override
@@ -181,10 +204,10 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
     @Override
     public Object getTransformRestoreData() {
         return new Object[]{
-            ellipse.clone(),
-            TRANSFORM.getClone(this),
-            FILL_GRADIENT.getClone(this),
-            STROKE_GRADIENT.getClone(this)};
+                ellipse.clone(),
+                TRANSFORM.getClone(this),
+                FILL_GRADIENT.getClone(this),
+                STROKE_GRADIENT.getClone(this)};
     }
 
     // ATTRIBUTES

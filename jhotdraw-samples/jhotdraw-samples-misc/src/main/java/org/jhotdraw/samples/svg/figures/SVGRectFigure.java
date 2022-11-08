@@ -7,26 +7,27 @@
  */
 package org.jhotdraw.samples.svg.figures;
 
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
-
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
-import org.jhotdraw.draw.*;
-import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_JOIN;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_MITER_LIMIT;
-import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
+import org.jhotdraw.samples.util.RectUtil;
+import org.jhotdraw.samples.util.SharedUtil;
+
+import java.awt.*;
+import java.awt.geom.*;
+import java.util.Collection;
+import java.util.LinkedList;
+
+import static org.jhotdraw.draw.AttributeKeys.*;
+import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
+import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
 /**
  * SVGRect.
@@ -34,7 +35,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
+public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, RectangleAdapter {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -59,7 +60,13 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
         double cv = 4.0 / 3.0 * a * b / c;
         ACV = (1.0 - cv);
     }
+
+    public void setRoundrect(RoundRectangle2D.Double roundrect) {
+        this.roundrect = roundrect;
+    }
+
     /**
+     *
      */
     private RoundRectangle2D.Double roundrect;
     /**
@@ -70,6 +77,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
      * This is used to perform faster hit testing.
      */
     private transient Shape cachedHitShape;
+
+    private final RectUtil rectUtil;
+
+    private final SharedUtil sharedUtil;
 
     /**
      * Creates a new instance.
@@ -85,6 +96,8 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @FeatureEntryPoint(value = "RectangleConstructor")
     public SVGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
+        this.rectUtil = new RectUtil();
+        this.sharedUtil = new SharedUtil();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -107,31 +120,60 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
             // We have to generate the path for the round rectangle manually,
             // because the path of a Java RoundRectangle is drawn counter clockwise
             // whereas an SVG rect needs to be drawn clockwise.
-            Path2D.Double p = new Path2D.Double();
-            double aw = roundrect.arcwidth / 2d;
-            double ah = roundrect.archeight / 2d;
-            p.moveTo((roundrect.x + aw), (float) roundrect.y);
-            p.lineTo((roundrect.x + roundrect.width - aw), (float) roundrect.y);
-            p.curveTo((roundrect.x + roundrect.width - aw * ACV), (float) roundrect.y,
-                    (roundrect.x + roundrect.width), (float) (roundrect.y + ah * ACV),
-                    (roundrect.x + roundrect.width), (roundrect.y + ah));
-            p.lineTo((roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah));
-            p.curveTo(
-                    (roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah * ACV),
-                    (roundrect.x + roundrect.width - aw * ACV), (roundrect.y + roundrect.height),
-                    (roundrect.x + roundrect.width - aw), (roundrect.y + roundrect.height));
-            p.lineTo((roundrect.x + aw), (roundrect.y + roundrect.height));
-            p.curveTo((roundrect.x + aw * ACV), (roundrect.y + roundrect.height),
-                    (roundrect.x), (roundrect.y + roundrect.height - ah * ACV),
-                    (float) roundrect.x, (roundrect.y + roundrect.height - ah));
-            p.lineTo((float) roundrect.x, (roundrect.y + ah));
-            p.curveTo((roundrect.x), (roundrect.y + ah * ACV),
-                    (roundrect.x + aw * ACV), (float) (roundrect.y),
-                    (float) (roundrect.x + aw), (float) (roundrect.y));
-            p.closePath();
+            Path2D.Double p = initDrawStroke();
             g.draw(p);
         }
     }
+
+    private Path2D.Double initDrawStroke() {
+        Path2D.Double p = new Path2D.Double();
+        double aw = roundrect.arcwidth / 2d;
+        double ah = roundrect.archeight / 2d;
+
+        p.moveTo((roundrect.x + aw), (float) roundrect.y);
+        this.generateFirstStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y, aw, ah);
+        this.generateSecondStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y + roundrect.height, aw, ah);
+        this.generateThirdStrokeLineAndCurve(p, roundrect.x, roundrect.y + roundrect.height, aw, ah);
+        this.generateFinalStrokeLineAndCurve(p, roundrect.x, roundrect.y, aw, ah);
+
+        p.closePath();
+        return p;
+    }
+
+
+    private void generateFirstStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double y, double aw, double ah) {
+        p.lineTo(xAndWidth - aw, (float) y);
+        p.curveTo((xAndWidth - aw * ACV), (float) y,
+                xAndWidth, (float) (y + ah * ACV),
+                xAndWidth, (y + ah));
+    }
+
+    private void generateSecondStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double yAndHeight, double aw, double ah) {
+        p.lineTo(xAndWidth, (yAndHeight - ah));
+        p.curveTo((xAndWidth), (float) (yAndHeight - ah * ACV),
+                (xAndWidth - aw * ACV), (float) (yAndHeight),
+                (xAndWidth - aw), (yAndHeight));
+    }
+
+    private void generateThirdStrokeLineAndCurve(Path2D.Double p, double x, double yAndHeight, double aw, double ah) {
+        p.lineTo((x + aw), (yAndHeight));
+        p.curveTo((x + aw * ACV), (yAndHeight),
+                (x), (float) (yAndHeight - ah * ACV),
+                (float) (x), (yAndHeight - ah));
+    }
+
+    private void generateFinalStrokeLineAndCurve(Path2D.Double p, double x, double y, double aw, double ah) {
+        p.lineTo((float) x, (y + ah));
+        p.curveTo((x), (y + ah * ACV),
+                (x + aw * ACV), (float) (y),
+                (float) (x + aw), (float) (y));
+
+        p.lineTo((float) roundrect.x, (roundrect.y + ah));
+        p.curveTo((roundrect.x), (roundrect.y + ah * ACV),
+                (roundrect.x + aw * ACV), (float) (roundrect.y),
+                (float) (roundrect.x + aw), (float) (roundrect.y));
+    }
+
 
     // SHAPE AND BOUNDS
     public double getX() {
@@ -235,36 +277,17 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
         invalidate();
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
     }
 
-    private Shape getTransformedShape() {
-        if (cachedTransformedShape == null) {
-            if (getArcHeight() == 0 || getArcWidth() == 0) {
-                cachedTransformedShape = roundrect.getBounds2D();
-            } else {
-                cachedTransformedShape = (Shape) roundrect.clone();
-            }
-            if (get(TRANSFORM) != null) {
-                cachedTransformedShape = get(TRANSFORM).createTransformedShape(cachedTransformedShape);
-            }
-        }
-        return cachedTransformedShape;
+    public Shape getTransformedShape() {
+        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this);
     }
 
     private Shape getHitShape() {
-        if (cachedHitShape == null) {
-            if (get(FILL_COLOR) != null || get(FILL_GRADIENT) != null) {
-                cachedHitShape = new GrowStroke(
-                        (float) SVGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
-                        (float) SVGAttributeKeys.getStrokeTotalMiterLimit(this, 1.0)).createStrokedShape(getTransformedShape());
-            } else {
-                cachedHitShape = SVGAttributeKeys.getHitStroke(this, 1.0).createStrokedShape(getTransformedShape());
-            }
-        }
-        return cachedHitShape;
+        return sharedUtil.getHitShape(cachedHitShape, this, this);
     }
 
     /**
@@ -276,9 +299,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @Override
     public void transform(AffineTransform tx) {
         invalidateTransformedShape();
-        if (get(TRANSFORM) != null
-                || //              (tx.getType() & (AffineTransform.TYPE_TRANSLATION | AffineTransform.TYPE_MASK_SCALE)) != tx.getType()) {
-                (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
+        if (get(TRANSFORM) != null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
             if (get(TRANSFORM) == null) {
                 set(TRANSFORM, (AffineTransform) tx.clone());
             } else {
@@ -320,10 +341,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @Override
     public Object getTransformRestoreData() {
         return new Object[]{
-            roundrect.clone(),
-            TRANSFORM.getClone(this),
-            FILL_GRADIENT.getClone(this),
-            STROKE_GRADIENT.getClone(this)};
+                roundrect.clone(),
+                TRANSFORM.getClone(this),
+                FILL_GRADIENT.getClone(this),
+                STROKE_GRADIENT.getClone(this)};
     }
 
     // EDITING
@@ -368,5 +389,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     public void invalidate() {
         super.invalidate();
         invalidateTransformedShape();
+    }
+
+    public static SVGRectFigure newDefaultRectangle() {
+        return new SVGRectFigure();
     }
 }
