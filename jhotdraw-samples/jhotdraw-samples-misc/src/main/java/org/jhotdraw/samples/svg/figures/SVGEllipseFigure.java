@@ -21,6 +21,7 @@ import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.SharedAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
@@ -31,7 +32,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure {
+public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, SharedAdapter {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
@@ -119,7 +120,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure {
         return getHitShape().contains(p);
     }
 
-    private Shape getTransformedShape() {
+    public Shape getTransformedShape() {
         if (cachedTransformedShape == null) {
             if (get(TRANSFORM) == null) {
                 cachedTransformedShape = ellipse;
