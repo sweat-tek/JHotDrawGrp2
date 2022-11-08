@@ -78,10 +78,6 @@ public class SVGTextFigure
 
     // DRAWING
     @Override
-    protected void drawText(java.awt.Graphics2D g) {
-    }
-
-    @Override
     protected void drawFill(Graphics2D g) {
         g.fill(getTextShape());
     }
@@ -119,17 +115,7 @@ public class SVGTextFigure
         if (cachedBounds == null) {
             cachedBounds = new Rectangle2D.Double();
             cachedBounds.setRect(getTextShape().getBounds2D());
-            String text = getText();
-            if (text == null || text.length() == 0) {
-                text = " ";
-            }
-            FontRenderContext frc = getFontRenderContext();
-            HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
-            if (get(FONT_UNDERLINE)) {
-                textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-            }
-            TextLayout textLayout = new TextLayout(text, textAttributes, frc);
+            TextLayout textLayout = getTextLayout();
             cachedBounds.setRect(coordinates[0].x, coordinates[0].y - textLayout.getAscent(), textLayout.getAdvance(), textLayout.getAscent());
             AffineTransform tx = new AffineTransform();
             tx.translate(coordinates[0].x, coordinates[0].y);
@@ -184,17 +170,7 @@ public class SVGTextFigure
 
     private Shape getTextShape() {
         if (cachedTextShape == null) {
-            String text = getText();
-            if (text == null || text.length() == 0) {
-                text = " ";
-            }
-            FontRenderContext frc = getFontRenderContext();
-            HashMap<TextAttribute, Object> textAttributes = new HashMap<TextAttribute, Object>();
-            textAttributes.put(TextAttribute.FONT, getFont());
-            if (get(FONT_UNDERLINE)) {
-                textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
-            }
-            TextLayout textLayout = new TextLayout(text, textAttributes, frc);
+            TextLayout textLayout = getTextLayout();
             AffineTransform tx = new AffineTransform();
             tx.translate(coordinates[0].x, coordinates[0].y);
             switch (get(TEXT_ANCHOR)) {
@@ -208,14 +184,24 @@ public class SVGTextFigure
                     break;
             }
             tx.rotate(rotates[0]);
-            /*
-             if (get(TRANSFORM) != null) {
-             tx.preConcatenate(get(TRANSFORM));
-             }*/
             cachedTextShape = tx.createTransformedShape(textLayout.getOutline(tx));
             cachedTextShape = textLayout.getOutline(tx);
         }
         return cachedTextShape;
+    }
+
+    private TextLayout getTextLayout() {
+        String text = getText();
+        if (text == null || text.length() == 0) {
+            text = " ";
+        }
+        FontRenderContext frc = getFontRenderContext();
+        HashMap<TextAttribute, Object> textAttributes = new HashMap<>();
+        textAttributes.put(TextAttribute.FONT, getFont());
+        if (get(FONT_UNDERLINE)) {
+            textAttributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+        }
+        return new TextLayout(text, textAttributes, frc);
     }
 
     @Override
@@ -328,7 +314,6 @@ public class SVGTextFigure
 
     @Override
     public int getTextColumns() {
-        //return (getText() == null) ? 4 : Math.min(getText().length(), 4);
         return 4;
     }
 
@@ -340,18 +325,15 @@ public class SVGTextFigure
     @Override
     public Color getTextColor() {
         return get(FILL_COLOR);
-        //   return get(TEXT_COLOR);
     }
 
     @Override
     public Color getFillColor() {
         return get(FILL_COLOR) == null || get(FILL_COLOR).equals(Color.white) ? Color.black : Color.WHITE;
-        //  return get(FILL_COLOR);
     }
 
     @Override
     public void setFontSize(float size) {
-        // put(FONT_SIZE,  new Double(size));
         Point2D.Double p = new Point2D.Double(0, size);
         AffineTransform tx = get(TRANSFORM);
         if (tx != null) {
@@ -369,7 +351,6 @@ public class SVGTextFigure
 
     @Override
     public float getFontSize() {
-        //   return get(FONT_SIZE).floatValue();
         Point2D.Double p = new Point2D.Double(0, get(FONT_SIZE));
         AffineTransform tx = get(TRANSFORM);
         if (tx != null) {
@@ -377,12 +358,6 @@ public class SVGTextFigure
             Point2D.Double p0 = new Point2D.Double(0, 0);
             tx.transform(p0, p0);
             p.y -= p0.y;
-            /*
-             try {
-             tx.inverseTransform(p, p);
-             } catch (NoninvertibleTransformException ex) {
-             ex.printStackTrace();
-             }*/
         }
         return (float) Math.abs(p.y);
     }
@@ -405,7 +380,7 @@ public class SVGTextFigure
 
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
+        LinkedList<Handle> handles = new LinkedList<>();
         switch (detailLevel % 2) {
             case -1: // Mouse hover handles
                 handles.add(new BoundsOutlineHandle(this, false, true));
@@ -434,11 +409,7 @@ public class SVGTextFigure
      */
     @Override
     public Tool getTool(Point2D.Double p) {
-        if (isEditable() && contains(p)) {
-            TextEditingTool tool = new TextEditingTool(this);
-            return tool;
-        }
-        return null;
+        return (isEditable() && contains(p)) ? new TextEditingTool(this) : null;
     }
 
     @Override
