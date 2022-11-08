@@ -7,28 +7,28 @@
  */
 package org.jhotdraw.samples.odg.figures;
 
-import org.jhotdraw.draw.figure.ConnectionFigure;
-import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
-import org.jhotdraw.draw.*;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_JOIN;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_MITER_LIMIT;
-import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import org.jhotdraw.draw.connector.Connector;
+import org.jhotdraw.draw.figure.ConnectionFigure;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Dimension2DDouble;
-import org.jhotdraw.geom.Geom;
 import org.jhotdraw.geom.GrowStroke;
 import org.jhotdraw.samples.adapter.RectangleAdapter;
-import org.jhotdraw.samples.odg.Gradient;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
 import org.jhotdraw.samples.util.RectUtil;
 
-import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.util.Collection;
+import java.util.LinkedList;
+
+import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+import static org.jhotdraw.samples.odg.ODGAttributeKeys.FILL_GRADIENT;
+import static org.jhotdraw.samples.odg.ODGAttributeKeys.STROKE_GRADIENT;
 
 /**
  * ODGRect.
@@ -125,24 +125,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     @Override
     public Rectangle2D.Double getDrawingArea() {
-        Rectangle2D rx = getTransformedShape().getBounds2D();
-        Rectangle2D.Double r = (rx instanceof Rectangle2D.Double) ? (Rectangle2D.Double) rx : new Rectangle2D.Double(rx.getX(), rx.getY(), rx.getWidth(), rx.getHeight());
-        if (get(TRANSFORM) == null) {
-            double g = ODGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2;
-            Geom.grow(r, g, g);
-        } else {
-            double strokeTotalWidth = AttributeKeys.getStrokeTotalWidth(this, 1.0);
-            double width = strokeTotalWidth / 2d;
-            if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                width *= get(STROKE_MITER_LIMIT);
-            }
-            if (get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
-                width += strokeTotalWidth * 2;
-            }
-            width++;
-            Geom.grow(r, width, width);
-        }
-        return r;
+        double hitGrowth = ODGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2;
+        return rectUtil.getDrawingArea(this, this, hitGrowth);
     }
 
     /**
@@ -168,13 +152,10 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     }
 
     public Shape getTransformedShape() {
-        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this );
+        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this);
     }
 
     private Shape getHitShape() {
-
-
-
         if (cachedHitShape == null) {
             cachedHitShape = new GrowStroke(
                     (float) ODGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
@@ -190,36 +171,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
      */
     @Override
     public void transform(AffineTransform tx) {
-        invalidateTransformedShape();
-        if (get(TRANSFORM) != null
-                || //              (tx.getType() & (AffineTransform.TYPE_TRANSLATION | AffineTransform.TYPE_MASK_SCALE)) != tx.getType()) {
-                (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
-            if (get(TRANSFORM) == null) {
-                set(TRANSFORM, (AffineTransform) tx.clone());
-            } else {
-                AffineTransform t = TRANSFORM.getClone(this);
-                t.preConcatenate(tx);
-                set(TRANSFORM, t);
-            }
-        } else {
-            Point2D.Double anchor = getStartPoint();
-            Point2D.Double lead = getEndPoint();
-            setBounds(
-                    (Point2D.Double) tx.transform(anchor, anchor),
-                    (Point2D.Double) tx.transform(lead, lead));
-            if (get(FILL_GRADIENT) != null
-                    && !get(FILL_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = FILL_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(FILL_GRADIENT, g);
-            }
-            if (get(STROKE_GRADIENT) != null
-                    && !get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = STROKE_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(STROKE_GRADIENT, g);
-            }
-        }
+        rectUtil.transform(tx, this, this);
     }
 
     // ATTRIBUTES
@@ -247,10 +199,10 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     @Override
     public Object getTransformRestoreData() {
         return new Object[]{
-            roundrect.clone(),
-            TRANSFORM.getClone(this),
-            FILL_GRADIENT.getClone(this),
-            STROKE_GRADIENT.getClone(this)};
+                roundrect.clone(),
+                TRANSFORM.getClone(this),
+                FILL_GRADIENT.getClone(this),
+                STROKE_GRADIENT.getClone(this)};
     }
 
     // EDITING
