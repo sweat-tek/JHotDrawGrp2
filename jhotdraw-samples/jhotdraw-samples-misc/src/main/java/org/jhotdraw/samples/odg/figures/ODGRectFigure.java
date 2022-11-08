@@ -14,8 +14,10 @@ import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.RectImageAdapter;
 import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
+import org.jhotdraw.samples.util.RectImageUtil;
 import org.jhotdraw.samples.util.RectUtil;
 
 import java.awt.*;
@@ -36,7 +38,7 @@ import static org.jhotdraw.samples.odg.ODGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, RectangleAdapter {
+public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, RectangleAdapter, RectImageAdapter {
 
     private static final long serialVersionUID = 1L;
     private RoundRectangle2D.Double roundrect;
@@ -139,11 +141,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        invalidateTransformedShape();
-        roundrect.x = Math.min(anchor.x, lead.x);
-        roundrect.y = Math.min(anchor.y, lead.y);
-        roundrect.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        roundrect.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
+        RectImageUtil imageUtil = new RectImageUtil();
+        imageUtil.setBounds(anchor, lead, this, this.roundrect);
     }
 
     public void invalidateTransformedShape() {
@@ -156,8 +155,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     }
 
     private Shape getHitShape() {
-
-
         if (cachedHitShape == null) {
             cachedHitShape = new GrowStroke(
                     (float) ODGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,

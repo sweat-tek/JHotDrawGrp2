@@ -17,7 +17,6 @@ import java.io.*;
 import java.util.*;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import org.jhotdraw.draw.*;
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import org.jhotdraw.draw.event.TransformRestoreEdit;
 import org.jhotdraw.draw.handle.BoundsOutlineHandle;
@@ -25,8 +24,11 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.GrowStroke;
+import org.jhotdraw.samples.adapter.RectImageAdapter;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
+
+import org.jhotdraw.samples.util.RectImageUtil;
 import org.jhotdraw.util.*;
 
 /**
@@ -35,7 +37,7 @@ import org.jhotdraw.util.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, ImageHolderFigure {
+public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, ImageHolderFigure, RectImageAdapter {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -159,16 +161,17 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        invalidateTransformedShape();
-        rectangle.x = Math.min(anchor.x, lead.x);
-        rectangle.y = Math.min(anchor.y, lead.y);
-        rectangle.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        rectangle.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
+        RectImageUtil imageUtil = new RectImageUtil();
+        imageUtil.setBounds(anchor, lead, this, this.rectangle);
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
+    }
+
+    public void setRectangle(Rectangle2D.Double rectangle) {
+        this.rectangle = rectangle;
     }
 
     private Shape getTransformedShape() {
@@ -386,12 +389,7 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
      * imageData array instead of cloning it. Do not modify the imageData
      * array after invoking this method.
      */
-    public void setImageData(byte[] imageData) {
-        willChange();
-        this.imageData = imageData;
-        this.bufferedImage = null;
-        changed();
-    }
+
 
     /**
      * Sets the buffered image.
