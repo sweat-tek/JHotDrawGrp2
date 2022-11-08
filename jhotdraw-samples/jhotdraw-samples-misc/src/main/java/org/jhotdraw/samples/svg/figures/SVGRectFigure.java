@@ -129,43 +129,39 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         double ah = roundrect.archeight / 2d;
 
         p.moveTo((roundrect.x + aw), (float) roundrect.y);
-        this.generateFirstStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y, aw, ah);
-        this.generateSecondStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y + roundrect.height, aw, ah);
-        this.generateThirdStrokeLineAndCurve(p, roundrect.x, roundrect.y + roundrect.height, aw, ah);
-        this.generateFinalStrokeLineAndCurve(p, roundrect.x, roundrect.y, aw, ah);
+        this.generateFirstStrokeLineAndCurve(p, aw, ah);
+        this.generateSecondStrokeLineAndCurve(p, aw, ah);
+        this.generateThirdStrokeLineAndCurve(p, aw, ah);
+        this.generateFinalStrokeLineAndCurve(p, aw, ah);
 
         p.closePath();
         return p;
     }
 
 
-    private void generateFirstStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double y, double aw, double ah) {
-        p.lineTo(xAndWidth - aw, (float) y);
-        p.curveTo((xAndWidth - aw * ACV), (float) y,
-                xAndWidth, (float) (y + ah * ACV),
-                xAndWidth, (y + ah));
+    private void generateFirstStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
+        p.lineTo((roundrect.x + roundrect.width - aw), (float) roundrect.y);
+        p.curveTo((roundrect.x + roundrect.width - aw * ACV), (float) roundrect.y,
+                (roundrect.x + roundrect.width), (float) (roundrect.y + ah * ACV),
+                (roundrect.x + roundrect.width), (roundrect.y + ah));
     }
 
-    private void generateSecondStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double yAndHeight, double aw, double ah) {
-        p.lineTo(xAndWidth, (yAndHeight - ah));
-        p.curveTo((xAndWidth), (float) (yAndHeight - ah * ACV),
-                (xAndWidth - aw * ACV), (float) (yAndHeight),
-                (xAndWidth - aw), (yAndHeight));
+    private void generateSecondStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
+        p.lineTo((roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah));
+        p.curveTo(
+                (roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah * ACV),
+                (roundrect.x + roundrect.width - aw * ACV), (roundrect.y + roundrect.height),
+                (roundrect.x + roundrect.width - aw), (roundrect.y + roundrect.height));
     }
 
-    private void generateThirdStrokeLineAndCurve(Path2D.Double p, double x, double yAndHeight, double aw, double ah) {
-        p.lineTo((x + aw), (yAndHeight));
-        p.curveTo((x + aw * ACV), (yAndHeight),
-                (x), (float) (yAndHeight - ah * ACV),
-                (float) (x), (yAndHeight - ah));
+    private void generateThirdStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
+        p.lineTo((roundrect.x + aw), (roundrect.y + roundrect.height));
+        p.curveTo((roundrect.x + aw * ACV), (roundrect.y + roundrect.height),
+                (roundrect.x), (roundrect.y + roundrect.height - ah * ACV),
+                (float) roundrect.x, (roundrect.y + roundrect.height - ah));
     }
 
-    private void generateFinalStrokeLineAndCurve(Path2D.Double p, double x, double y, double aw, double ah) {
-        p.lineTo((float) x, (y + ah));
-        p.curveTo((x), (y + ah * ACV),
-                (x + aw * ACV), (float) (y),
-                (float) (x + aw), (float) (y));
-
+    private void generateFinalStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.lineTo((float) roundrect.x, (roundrect.y + ah));
         p.curveTo((roundrect.x), (roundrect.y + ah * ACV),
                 (roundrect.x + aw * ACV), (float) (roundrect.y),
