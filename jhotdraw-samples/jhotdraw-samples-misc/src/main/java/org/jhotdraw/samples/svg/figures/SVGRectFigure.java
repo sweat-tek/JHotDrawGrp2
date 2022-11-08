@@ -12,9 +12,11 @@ import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
+import org.jhotdraw.samples.adapter.RectImageAdapter;
 import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.util.RectImageUtil;
 import org.jhotdraw.samples.util.RectUtil;
 import org.jhotdraw.samples.util.SharedUtil;
 
@@ -33,7 +35,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, RectangleAdapter {
+public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, RectangleAdapter, RectImageAdapter {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -247,12 +249,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        invalidateTransformedShape();
-        roundrect.x = Math.min(anchor.x, lead.x);
-        roundrect.y = Math.min(anchor.y, lead.y);
-        roundrect.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        roundrect.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
-        invalidate();
+
+        RectImageUtil imageUtil = new RectImageUtil();
+        imageUtil.setBounds(anchor, lead, this, this.roundrect);
     }
 
     public void invalidateTransformedShape() {
