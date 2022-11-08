@@ -13,11 +13,13 @@ import java.util.*;
 
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.*;
+
 import static org.jhotdraw.draw.AttributeKeys.FILL_COLOR;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_JOIN;
 import static org.jhotdraw.draw.AttributeKeys.STROKE_MITER_LIMIT;
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
+
 import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
@@ -26,6 +28,7 @@ import org.jhotdraw.geom.Geom;
 import org.jhotdraw.geom.GrowStroke;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 
 /**
@@ -59,7 +62,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
         double cv = 4.0 / 3.0 * a * b / c;
         ACV = (1.0 - cv);
     }
+
     /**
+     *
      */
     private RoundRectangle2D.Double roundrect;
     /**
@@ -320,10 +325,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     @Override
     public Object getTransformRestoreData() {
         return new Object[]{
-            roundrect.clone(),
-            TRANSFORM.getClone(this),
-            FILL_GRADIENT.getClone(this),
-            STROKE_GRADIENT.getClone(this)};
+                roundrect.clone(),
+                TRANSFORM.getClone(this),
+                FILL_GRADIENT.getClone(this),
+                STROKE_GRADIENT.getClone(this)};
     }
 
     // EDITING
@@ -368,5 +373,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure {
     public void invalidate() {
         super.invalidate();
         invalidateTransformedShape();
+    }
+
+    public static SVGRectFigure newDefaultRectangle() {
+        return new SVGRectFigure();
     }
 }
