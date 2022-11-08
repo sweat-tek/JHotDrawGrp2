@@ -12,6 +12,8 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
