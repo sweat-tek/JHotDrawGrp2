@@ -61,6 +61,10 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         ACV = (1.0 - cv);
     }
 
+    public void setRoundrect(RoundRectangle2D.Double roundrect) {
+        this.roundrect = roundrect;
+    }
+
     /**
      *
      */
@@ -273,7 +277,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         invalidate();
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
     }

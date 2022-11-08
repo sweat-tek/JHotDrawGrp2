@@ -40,6 +40,12 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     private static final long serialVersionUID = 1L;
     private RoundRectangle2D.Double roundrect;
+
+    @Override
+    public void setRoundrect(RoundRectangle2D.Double roundrect) {
+        this.roundrect = roundrect;
+    }
+
     /**
      * This is used to perform faster drawing.
      */
@@ -156,7 +162,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         roundrect.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
     }
 
-    private void invalidateTransformedShape() {
+    public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
     }
@@ -235,12 +241,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        invalidateTransformedShape();
-        Object[] restoreData = (Object[]) geometry;
-        roundrect = (RoundRectangle2D.Double) ((RoundRectangle2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
+        rectUtil.restoreTransformTo(geometry, this, this);
     }
 
     @Override
