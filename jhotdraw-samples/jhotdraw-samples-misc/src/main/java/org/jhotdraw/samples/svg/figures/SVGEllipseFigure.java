@@ -24,6 +24,8 @@ import org.jhotdraw.geom.GrowStroke;
 import org.jhotdraw.samples.adapter.SharedAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.util.SharedUtil;
+
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 
 /**
@@ -45,6 +47,8 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
      */
     private transient Shape cachedHitShape;
 
+    private final SharedUtil sharedUtil;
+
     /**
      * Creates a new instance.
      */
@@ -55,6 +59,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
+        this.sharedUtil = new SharedUtil();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -132,16 +137,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     }
 
     private Shape getHitShape() {
-        if (cachedHitShape == null) {
-            if (get(FILL_COLOR) != null || get(FILL_GRADIENT) != null) {
-                cachedHitShape = new GrowStroke(
-                        (float) SVGAttributeKeys.getStrokeTotalWidth(this, 1.0) / 2f,
-                        (float) SVGAttributeKeys.getStrokeTotalMiterLimit(this, 1.0)).createStrokedShape(getTransformedShape());
-            } else {
-                cachedHitShape = SVGAttributeKeys.getHitStroke(this, 1.0).createStrokedShape(getTransformedShape());
-            }
-        }
-        return cachedHitShape;
+        return sharedUtil.getHitShape(cachedHitShape, this, this);
     }
 
     @Override
