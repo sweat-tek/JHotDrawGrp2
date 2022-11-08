@@ -8,12 +8,10 @@
 package org.jhotdraw.samples.svg.figures;
 
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
-import org.jhotdraw.draw.AttributeKeys;
 import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
-import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.adapter.RectangleAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
@@ -25,7 +23,7 @@ import java.awt.geom.*;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import static org.jhotdraw.draw.AttributeKeys.*;
+import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
@@ -239,24 +237,8 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     public Rectangle2D.Double getDrawingArea() {
-        Rectangle2D rx = getTransformedShape().getBounds2D();
-        Rectangle2D.Double r = (rx instanceof Rectangle2D.Double) ? (Rectangle2D.Double) rx : new Rectangle2D.Double(rx.getX(), rx.getY(), rx.getWidth(), rx.getHeight());
-        if (get(TRANSFORM) == null) {
-            double g = SVGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d + 1d;
-            Geom.grow(r, g, g);
-        } else {
-            double strokeTotalWidth = AttributeKeys.getStrokeTotalWidth(this, 1.0);
-            double width = strokeTotalWidth / 2d;
-            if (get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                width *= get(STROKE_MITER_LIMIT);
-            }
-            if (get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
-                width += strokeTotalWidth * 2;
-            }
-            width++;
-            Geom.grow(r, width, width);
-        }
-        return r;
+        double hitGrowth = SVGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d + 1d;
+        return rectUtil.getDrawingArea(this, this, hitGrowth);
     }
 
     /**
@@ -298,34 +280,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @FeatureEntryPoint(value = "RectangleMove")
     @Override
     public void transform(AffineTransform tx) {
-        invalidateTransformedShape();
-        if (get(TRANSFORM) != null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
-            if (get(TRANSFORM) == null) {
-                set(TRANSFORM, (AffineTransform) tx.clone());
-            } else {
-                AffineTransform t = TRANSFORM.getClone(this);
-                t.preConcatenate(tx);
-                set(TRANSFORM, t);
-            }
-        } else {
-            Point2D.Double anchor = getStartPoint();
-            Point2D.Double lead = getEndPoint();
-            setBounds(
-                    (Point2D.Double) tx.transform(anchor, anchor),
-                    (Point2D.Double) tx.transform(lead, lead));
-            if (get(FILL_GRADIENT) != null
-                    && !get(FILL_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = FILL_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(FILL_GRADIENT, g);
-            }
-            if (get(STROKE_GRADIENT) != null
-                    && !get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = STROKE_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(STROKE_GRADIENT, g);
-            }
-        }
+        rectUtil.transform(tx, this, this);
     }
 
     @Override
