@@ -128,7 +128,7 @@ public class DefaultSVGFigureFactory implements SVGFigureFactory {
 
     @Override
     public Figure createImage(double x, double y, double w, double h,
-                              byte[] imageData, BufferedImage bufferedImage, Map<AttributeKey<?>, Object> a) {
+            byte[] imageData, BufferedImage bufferedImage, Map<AttributeKey<?>, Object> a) {
         SVGImageFigure figure = new SVGImageFigure();
         figure.setBounds(new Point2D.Double(x, y), new Point2D.Double(x + w, y + h));
         figure.setImage(imageData, bufferedImage);
