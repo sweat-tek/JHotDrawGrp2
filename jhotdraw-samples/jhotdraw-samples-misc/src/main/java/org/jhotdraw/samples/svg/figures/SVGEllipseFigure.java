@@ -14,10 +14,10 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.samples.SPI.Shape;
+import org.jhotdraw.samples.SPI.EllipseRectangle;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import org.jhotdraw.samples.bridge.SharedBridge;
+import org.jhotdraw.samples.bridge.EllipseRectangleBridge;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -37,7 +37,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGEllipseFigure extends SVGAttributedFigure implements org.jhotdraw.samples.svg.figures.SVGFigure, Shape {
+public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, EllipseRectangle {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
@@ -50,7 +50,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements org.jhotdra
      */
     private transient java.awt.Shape cachedHitShape;
 
-    private final SharedBridge sharedBridge;
+    private final EllipseRectangleBridge ellipseRectangleBridge;
 
     /**
      * Creates a new instance.
@@ -62,7 +62,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements org.jhotdra
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
-        this.sharedBridge = new SharedBridge();
+        this.ellipseRectangleBridge = new EllipseRectangleBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -140,7 +140,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements org.jhotdra
     }
 
     private java.awt.Shape getHitShape() {
-        return sharedBridge.getHitShape(cachedHitShape, this, this);
+        return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
     }
 
     @Override

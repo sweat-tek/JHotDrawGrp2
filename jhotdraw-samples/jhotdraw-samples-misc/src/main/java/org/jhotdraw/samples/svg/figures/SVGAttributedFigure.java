@@ -49,11 +49,12 @@ public abstract class SVGAttributedFigure extends AbstractAttributedFigure {
             if (opacity == 1d) {
                 drawFigure(g);
             }
+
             Rectangle2D.Double drawingArea = getDrawingArea();
             Rectangle2D clipBounds = g.getClipBounds();
-            if (clipBounds != null) {
-                Rectangle2D.intersect(drawingArea, clipBounds, drawingArea);
-            }
+
+            intersect(clipBounds, drawingArea);
+
             if (!drawingArea.isEmpty()) {
                 BufferedImage buf = new BufferedImage(
                         Math.max(1, (int) ((2 + drawingArea.width) * g.getTransform().getScaleX())),
@@ -71,6 +72,12 @@ public abstract class SVGAttributedFigure extends AbstractAttributedFigure {
                         2 + (int) drawingArea.width, 2 + (int) drawingArea.height, null);
                 g.setComposite(savedComposite);
             }
+        }
+    }
+
+    private void intersect(Rectangle2D clipBounds, Rectangle2D.Double drawingArea ){
+        if (clipBounds != null) {
+            Rectangle2D.intersect(drawingArea, clipBounds, drawingArea);
         }
     }
 

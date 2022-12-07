@@ -2,7 +2,7 @@ package org.jhotdraw.samples.SPI;
 
 import java.awt.geom.RoundRectangle2D;
 
-public interface Rectangle extends Shape {
+public interface Rectangle extends EllipseRectangle {
 
     double getX();
 

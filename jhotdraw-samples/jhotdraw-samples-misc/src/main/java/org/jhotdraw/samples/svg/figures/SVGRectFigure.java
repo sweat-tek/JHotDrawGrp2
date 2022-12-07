@@ -18,7 +18,7 @@ import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import org.jhotdraw.samples.bridge.RectImageBridge;
 import org.jhotdraw.samples.bridge.RectBridge;
-import org.jhotdraw.samples.bridge.SharedBridge;
+import org.jhotdraw.samples.bridge.EllipseRectangleBridge;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -80,7 +80,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     private final RectBridge rectBridge;
 
-    private final SharedBridge sharedBridge;
+    private final EllipseRectangleBridge ellipseRectangleBridge;
 
     /**
      * Creates a new instance.
@@ -97,7 +97,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     public SVGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
         this.rectBridge = new RectBridge();
-        this.sharedBridge = new SharedBridge();
+        this.ellipseRectangleBridge = new EllipseRectangleBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -264,7 +264,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     }
 
     private Shape getHitShape() {
-        return sharedBridge.getHitShape(cachedHitShape, this, this);
+        return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
     }
 
     /**
@@ -300,7 +300,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     // EDITING
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
+        LinkedList<Handle> handles = new LinkedList<>();
         switch (detailLevel % 2) {
             case -1: // Mouse hover handles
                 handles.add(new BoundsOutlineHandle(this, false, true));
