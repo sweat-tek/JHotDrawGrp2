@@ -151,7 +151,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     }
 
     public Shape getTransformedShape() {
-        return rectBridge.getTransformedShape(cachedTransformedShape, roundrect, this);
+        return rectBridge.getTransformedShape(cachedTransformedShape, roundrect, this, this);
     }
 
     private Shape getHitShape() {

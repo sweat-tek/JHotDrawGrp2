@@ -19,15 +19,15 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
 public class RectBridge {
 
-    public Shape getTransformedShape(Shape cachedTransformedShape, RoundRectangle2D.Double roundrect, Rectangle rectangle) {
+    public Shape getTransformedShape(Shape cachedTransformedShape, RoundRectangle2D.Double roundrect, Rectangle rectangle, Figure figure) {
         if (cachedTransformedShape == null) {
             if (rectangle.getArcHeight() != 0 || rectangle.getArcWidth() != 0) {
                 return (Shape) roundrect.clone();
             }
             cachedTransformedShape = roundrect.getBounds2D();
 
-            if (rectangle.get(TRANSFORM) != null) {
-                cachedTransformedShape = rectangle.get(TRANSFORM).createTransformedShape(cachedTransformedShape);
+            if (figure.get(TRANSFORM) != null) {
+                cachedTransformedShape = figure.get(TRANSFORM).createTransformedShape(cachedTransformedShape);
             }
         }
         return cachedTransformedShape;
@@ -46,13 +46,13 @@ public class RectBridge {
         Rectangle2D rx = rectangle.getTransformedShape().getBounds2D();
         Rectangle2D.Double r = (rx instanceof Rectangle2D.Double) ? (Rectangle2D.Double) rx : new Rectangle2D.Double(rx.getX(), rx.getY(), rx.getWidth(), rx.getHeight());
 
-        if (rectangle.get(TRANSFORM) != null) {
+        if (figure.get(TRANSFORM) != null) {
             double strokeTotalWidth = AttributeKeys.getStrokeTotalWidth(figure, 1.0);
             double width = strokeTotalWidth / 2d;
-            if (rectangle.get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                width *= rectangle.get(STROKE_MITER_LIMIT);
+            if (figure.get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
+                width *= figure.get(STROKE_MITER_LIMIT);
             }
-            if (rectangle.get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
+            if (figure.get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
                 width += strokeTotalWidth * 2;
             }
             width++;
@@ -67,7 +67,7 @@ public class RectBridge {
     public void transform(AffineTransform tx, Rectangle rectangle, Figure figure) {
         rectangle.invalidateTransformedShape();
 
-        if (rectangle.get(TRANSFORM) == null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
+        if (figure.get(TRANSFORM) == null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
             Point2D.Double anchor = figure.getStartPoint();
             Point2D.Double lead = figure.getEndPoint();
 
@@ -75,30 +75,30 @@ public class RectBridge {
                     (Point2D.Double) tx.transform(anchor, anchor),
                     (Point2D.Double) tx.transform(lead, lead));
 
-            if (rectangle.get(FILL_GRADIENT) != null
-                    && !rectangle.get(FILL_GRADIENT).isRelativeToFigureBounds()) {
+            if (figure.get(FILL_GRADIENT) != null
+                    && !figure.get(FILL_GRADIENT).isRelativeToFigureBounds()) {
                 this.gradientTransform(FILL_GRADIENT, tx, rectangle, figure);
             }
 
-            if (rectangle.get(STROKE_GRADIENT) != null
-                    && !rectangle.get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
+            if (figure.get(STROKE_GRADIENT) != null
+                    && !figure.get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
                 this.gradientTransform(STROKE_GRADIENT, tx, rectangle, figure);
             }
 
-            if (rectangle.get(TRANSFORM) != null) {
+            if (figure.get(TRANSFORM) != null) {
                 AffineTransform t = TRANSFORM.getClone(figure);
                 t.preConcatenate(tx);
-                rectangle.set(TRANSFORM, t);
+                figure.set(TRANSFORM, t);
             }
 
-            rectangle.set(TRANSFORM, (AffineTransform) tx.clone());
+            figure.set(TRANSFORM, (AffineTransform) tx.clone());
         }
     }
 
     private void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Rectangle rectangle, Figure figure){
         Gradient g = gradient.getClone(figure);
         g.transform(tx);
-        rectangle.set(gradient, g);
+        figure.set(gradient, g);
     }
 
 }

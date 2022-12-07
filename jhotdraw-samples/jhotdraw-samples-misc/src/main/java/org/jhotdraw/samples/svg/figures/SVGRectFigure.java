@@ -260,7 +260,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     }
 
     public Shape getTransformedShape() {
-        return rectBridge.getTransformedShape(cachedTransformedShape, roundrect, this);
+        return rectBridge.getTransformedShape(cachedTransformedShape, roundrect, this, this);
     }
 
     private Shape getHitShape() {
