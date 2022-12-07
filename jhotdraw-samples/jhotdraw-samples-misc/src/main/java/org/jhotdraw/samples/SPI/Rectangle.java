@@ -1,8 +1,8 @@
-package org.jhotdraw.samples.adapter;
+package org.jhotdraw.samples.SPI;
 
 import java.awt.geom.RoundRectangle2D;
 
-public interface RectangleAdapter extends SharedAdapter {
+public interface Rectangle extends Shape {
 
     double getX();
 

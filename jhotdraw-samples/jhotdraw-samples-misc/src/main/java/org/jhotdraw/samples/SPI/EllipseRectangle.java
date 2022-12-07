@@ -1,15 +1,13 @@
-package org.jhotdraw.samples.adapter;
+package org.jhotdraw.samples.SPI;
 
 import org.jhotdraw.draw.AttributeKey;
 
-import java.awt.*;
-
-public interface SharedAdapter {
+public interface Shape {
 
     <T> T get(AttributeKey<T> key);
 
     <T> void set(AttributeKey<T> key, T newValue);
 
-    Shape getTransformedShape();
+    java.awt.Shape getTransformedShape();
 
 }
