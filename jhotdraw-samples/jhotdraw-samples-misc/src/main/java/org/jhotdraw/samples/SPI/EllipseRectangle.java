@@ -1,6 +1,8 @@
 package org.jhotdraw.samples.SPI;
 
+import java.awt.*;
+
 public interface EllipseRectangle {
-    java.awt.Shape getTransformedShape();
+    Shape getTransformedShape();
 
 }

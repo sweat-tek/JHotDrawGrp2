@@ -20,6 +20,7 @@ public class EllipseRectangleBridge {
                 cachedHitShape = SVGAttributeKeys.getHitStroke(figure, 1.0).createStrokedShape(ellipseRectangle.getTransformedShape());
             }
         }
+
         return cachedHitShape;
     }
 }
