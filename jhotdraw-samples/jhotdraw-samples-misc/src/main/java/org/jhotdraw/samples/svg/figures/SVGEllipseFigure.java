@@ -20,6 +20,7 @@ import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import org.jhotdraw.samples.util.EllipseUtil;
 import org.jhotdraw.samples.util.SharedUtil;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
