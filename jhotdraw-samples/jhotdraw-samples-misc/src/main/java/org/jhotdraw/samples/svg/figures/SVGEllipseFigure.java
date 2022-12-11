@@ -16,7 +16,7 @@ import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.SPI.Ellipse;
 import org.jhotdraw.samples.bridge.EllipseBridge;
-import org.jhotdraw.samples.bridge.EllipseRectangleBridge;
+import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 
 import java.awt.*;

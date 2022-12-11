@@ -16,9 +16,8 @@ import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.GrowStroke;
 import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.SPI.Rectangle;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
-import org.jhotdraw.samples.bridge.RectImageBridge;
-import org.jhotdraw.samples.bridge.RectBridge;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -57,7 +56,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
      */
     private transient Shape cachedHitShape;
 
-    private final RectBridge rectBridge;
 
     /**
      * Creates a new instance.
@@ -72,7 +70,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     public ODGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
-        this.rectBridge = new RectBridge();
         ODGAttributeKeys.setDefaults(this);
     }
 
@@ -128,7 +125,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = ODGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2;
-        return rectBridge.getDrawingArea(this, this, hitGrowth);
+        return this.getDrawingArea( this, hitGrowth);
     }
 
     /**
@@ -150,10 +147,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         cachedHitShape = null;
     }
 
-    public Shape getTransformedShape() {
-        return rectBridge.getTransformedShape(cachedTransformedShape, roundrect, this, this);
-    }
-
     private Shape getHitShape() {
         if (cachedHitShape == null) {
             cachedHitShape = new GrowStroke(
@@ -163,6 +156,10 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         return cachedHitShape;
     }
 
+    public Shape getTransformedShape(){
+        return this.getTransformedShape(cachedTransformedShape, roundrect, this);
+    }
+
     /**
      * Transforms the figure.
      *
@@ -170,7 +167,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
      */
     @Override
     public void transform(AffineTransform tx) {
-        rectBridge.transform(tx, this, this);
+        this.transform(tx, this);
     }
 
     // ATTRIBUTES
@@ -192,7 +189,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        rectBridge.restoreTransformTo(geometry, this, this);
+        this.restoreTransformTo(geometry, this);
     }
 
     @Override

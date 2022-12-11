@@ -1,4 +1,4 @@
-package org.jhotdraw.samples.bridge;
+package org.jhotdraw.samples.svg.bridge;
 
 import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.geom.GrowStroke;

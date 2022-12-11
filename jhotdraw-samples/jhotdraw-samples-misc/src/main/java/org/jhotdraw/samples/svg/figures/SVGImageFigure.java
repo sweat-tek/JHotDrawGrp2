@@ -28,7 +28,7 @@ import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 
-import org.jhotdraw.samples.bridge.RectImageBridge;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.util.*;
 
 /**

@@ -48,11 +48,10 @@ public abstract class SVGAttributedFigure extends AbstractAttributedFigure {
         if (opacity != 0d) {
             if (opacity == 1d) {
                 drawFigure(g);
+                return;
             }
-
             Rectangle2D.Double drawingArea = getDrawingArea();
             Rectangle2D clipBounds = g.getClipBounds();
-
             this.intersect(clipBounds, drawingArea);
             this.drawFigureWithComposite(drawingArea, g, opacity);
         }
