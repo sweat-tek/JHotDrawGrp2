@@ -5,7 +5,6 @@ import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.figure.Figure;
 
 import java.awt.geom.Rectangle2D;
-import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,16 +12,15 @@ public class ThenFigure {
     @ExpectedScenarioState
     private DrawingEditor editor;
 
-    private List<Figure> figureList;
+    private Figure figure;
 
     public ThenFigure figureHasMoved() {
-        figureList = editor.getActiveView().getDrawing().getFiguresFrontToBack();
-        assert figureList.size() > 0;
+        figure = editor.getActiveView().getDrawing().getFiguresFrontToBack().get(0);
+        assert figure != null;
 
-        figureList.forEach((Figure figure) -> {
-            Rectangle2D.Double bounds = figure.getBounds();
-            assertBounds(bounds);
-        });
+        Rectangle2D.Double bounds = figure.getBounds();
+        assertBounds(bounds);
+
         return this;
     }
 
