@@ -1,0 +1,83 @@
+{
+  "className": "org.jhotdraw.samples.svg.RectangleUseCaseTest",
+  "name": "Rectangle Use Case",
+  "scenarios": [
+    {
+      "className": "org.jhotdraw.samples.svg.RectangleUseCaseTest",
+      "testMethodName": "movingRectangleFigure",
+      "description": "Moving rectangle figure",
+      "tagIds": [],
+      "explicitParameters": [],
+      "derivedParameters": [],
+      "scenarioCases": [
+        {
+          "caseNr": 1,
+          "steps": [
+            {
+              "name": "provide figure",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "provide figure"
+                },
+                {
+                  "value": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$72/0x000000080021f440@55e7a35c",
+                  "argumentInfo": {
+                    "argumentName": "testFigureCommand",
+                    "formattedValue": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$72/0x000000080021f440@55e7a35c"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 27479300,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "moving figure",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "moving figure"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 1845000,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "figure has moved",
+              "words": [
+                {
+                  "value": "Then",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "figure has moved"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 891600,
+              "depth": 0,
+              "parentFailed": false
+            }
+          ],
+          "explicitArguments": [],
+          "derivedArguments": [],
+          "status": "SUCCESS",
+          "durationInNanos": 388417200
+        }
+      ],
+      "casesAsTable": false,
+      "durationInNanos": 388417200
+    }
+  ],
+  "tagMap": {}
+}

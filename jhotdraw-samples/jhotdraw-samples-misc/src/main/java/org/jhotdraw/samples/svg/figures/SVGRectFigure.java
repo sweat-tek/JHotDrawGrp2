@@ -270,7 +270,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @FeatureEntryPoint(value = "RectangleMove")
     @Override
     public void transform(AffineTransform tx) {
-        this.transform(tx, this);
+        transform(tx, this);
     }
 
     @Override

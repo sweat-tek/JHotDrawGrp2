@@ -13,7 +13,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import static org.jhotdraw.draw.AttributeKeys.*;
-import static org.jhotdraw.draw.AttributeKeys.STROKE_CAP;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
@@ -91,15 +90,9 @@ public interface Rectangle extends EllipseRectangle {
                     (Point2D.Double) tx.transform(anchor, anchor),
                     (Point2D.Double) tx.transform(lead, lead));
 
-            if (figure.get(FILL_GRADIENT) != null
-                    && !figure.get(FILL_GRADIENT).isRelativeToFigureBounds()) {
-                this.gradientTransform(FILL_GRADIENT, tx, figure);
-            }
+            this.gradientTransform(FILL_GRADIENT, tx, figure);
 
-            if (figure.get(STROKE_GRADIENT) != null
-                    && !figure.get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
-                this.gradientTransform(STROKE_GRADIENT, tx, figure);
-            }
+            this.gradientTransform(STROKE_GRADIENT, tx, figure);
 
             if (figure.get(TRANSFORM) != null) {
                 AffineTransform t = TRANSFORM.getClone(figure);
@@ -111,10 +104,12 @@ public interface Rectangle extends EllipseRectangle {
         }
     }
 
-    default void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Figure figure){
-        Gradient g = gradient.getClone(figure);
-        g.transform(tx);
-        figure.set(gradient, g);
+    default void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Figure figure) {
+        if (figure.get(gradient) != null && !figure.get(gradient).isRelativeToFigureBounds()) {
+            Gradient g = gradient.getClone(figure);
+            g.transform(tx);
+            figure.set(gradient, g);
+        }
     }
 
 
