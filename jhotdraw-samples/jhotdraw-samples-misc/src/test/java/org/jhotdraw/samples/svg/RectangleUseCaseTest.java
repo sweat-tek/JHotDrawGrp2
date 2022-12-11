@@ -1,7 +1,6 @@
 package org.jhotdraw.samples.svg;
 
 import com.tngtech.jgiven.junit.ScenarioTest;
-import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.samples.svg.behaviourtest.GivenFigure;
 import org.jhotdraw.samples.svg.behaviourtest.TestFigureCommand;
 import org.jhotdraw.samples.svg.behaviourtest.ThenFigure;
