@@ -104,7 +104,7 @@ public interface Rectangle extends EllipseRectangle {
         }
     }
 
-    default void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Figure figure) {
+    private void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Figure figure) {
         if (figure.get(gradient) != null && !figure.get(gradient).isRelativeToFigureBounds()) {
             Gradient g = gradient.getClone(figure);
             g.transform(tx);

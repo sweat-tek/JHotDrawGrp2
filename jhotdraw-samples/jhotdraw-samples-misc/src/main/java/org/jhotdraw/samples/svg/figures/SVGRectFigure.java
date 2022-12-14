@@ -223,7 +223,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = SVGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d + 1d;
-        return this.getDrawingArea(this, hitGrowth);
+        return getDrawingArea(this, hitGrowth);
     }
 
     /**
