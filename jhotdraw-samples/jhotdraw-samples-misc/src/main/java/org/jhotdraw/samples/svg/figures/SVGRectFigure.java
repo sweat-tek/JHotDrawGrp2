@@ -14,10 +14,10 @@ import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.SPI.Rectangle;
-import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
-import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -110,15 +110,15 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        if (roundrect.archeight == 0 && roundrect.arcwidth == 0) {
-            g.draw(roundrect.getBounds2D());
-        } else {
+        if (roundrect.archeight != 0 && roundrect.arcwidth != 0) {
             // We have to generate the path for the round rectangle manually,
             // because the path of a Java RoundRectangle is drawn counter clockwise
             // whereas an SVG rect needs to be drawn clockwise.
             Path2D.Double p = initDrawStroke();
             g.draw(p);
+            return;
         }
+        g.draw(roundrect.getBounds2D());
     }
 
     private Path2D.Double initDrawStroke() {
@@ -126,46 +126,34 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         double aw = roundrect.arcwidth / 2d;
         double ah = roundrect.archeight / 2d;
 
-        p.moveTo((roundrect.x + aw), (float) roundrect.y);
-        this.generateFirstStrokeLineAndCurve(p, aw, ah);
-        this.generateSecondStrokeLineAndCurve(p, aw, ah);
-        this.generateThirdStrokeLineAndCurve(p, aw, ah);
-        this.generateFinalStrokeLineAndCurve(p, aw, ah);
-
-        p.closePath();
-        return p;
+        return generateStrokeLineAndCurve(p, aw, ah);
     }
 
-    private Path2D.Double generateFirstStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
+    private Path2D.Double generateStrokeLineAndCurve(Path2D.Double p, double aw, double ah){
+        p.moveTo((roundrect.x + aw), (float) roundrect.y);
+
         p.lineTo((roundrect.x + roundrect.width - aw), (float) roundrect.y);
         p.curveTo((roundrect.x + roundrect.width - aw * ACV), (float) roundrect.y,
                 (roundrect.x + roundrect.width), (float) (roundrect.y + ah * ACV),
                 (roundrect.x + roundrect.width), (roundrect.y + ah));
-        return p;
-    }
 
-    private Path2D.Double generateSecondStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.lineTo((roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah));
         p.curveTo(
                 (roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah * ACV),
                 (roundrect.x + roundrect.width - aw * ACV), (roundrect.y + roundrect.height),
                 (roundrect.x + roundrect.width - aw), (roundrect.y + roundrect.height));
-        return p;
-    }
 
-    private Path2D.Double generateThirdStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.lineTo((roundrect.x + aw), (roundrect.y + roundrect.height));
         p.curveTo((roundrect.x + aw * ACV), (roundrect.y + roundrect.height),
                 (roundrect.x), (roundrect.y + roundrect.height - ah * ACV),
                 (float) roundrect.x, (roundrect.y + roundrect.height - ah));
-        return p;
-    }
 
-    private Path2D.Double generateFinalStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.lineTo((float) roundrect.x, (roundrect.y + ah));
         p.curveTo((roundrect.x), (roundrect.y + ah * ACV),
                 (roundrect.x + aw * ACV), (float) (roundrect.y),
                 (float) (roundrect.x + aw), (float) (roundrect.y));
+
+        p.closePath();
         return p;
     }
 
