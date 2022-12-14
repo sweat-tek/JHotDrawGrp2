@@ -72,7 +72,10 @@ public interface Rectangle extends EllipseRectangle {
             }
             width++;
             Geom.grow(r, width, width);
+
+            return r;
         }
+
         double g = hitGrowth;
         Geom.grow(r, g, g);
 
