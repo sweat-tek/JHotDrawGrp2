@@ -14,13 +14,15 @@ import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.SPI.Rectangle;
-import org.jhotdraw.samples.svg.Gradient;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -129,7 +131,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         return generateStrokeLineAndCurve(p, aw, ah);
     }
 
-    private Path2D.Double generateStrokeLineAndCurve(Path2D.Double p, double aw, double ah){
+    private Path2D.Double generateStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.moveTo((roundrect.x + aw), (float) roundrect.y);
 
         p.lineTo((roundrect.x + roundrect.width - aw), (float) roundrect.y);
@@ -223,7 +225,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = SVGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d + 1d;
-        return getDrawingArea(this, hitGrowth);
+        return getDrawingArea(hitGrowth);
     }
 
     /**
@@ -248,27 +250,6 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     private Shape getHitShape() {
         return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
-    }
-
-    /**
-     * Transforms the figure.
-     *
-     * @param tx The transformation.
-     */
-    @FeatureEntryPoint(value = "RectangleMove")
-    @Override
-    public void transform(AffineTransform tx) {
-        transform(tx, this);
-    }
-
-    @Override
-    public void restoreTransformTo(Object geometry) {
-        invalidateTransformedShape();
-        Object[] restoreData = (Object[]) geometry;
-        roundrect = (RoundRectangle2D.Double) ((RoundRectangle2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
     }
 
     @Override
@@ -326,7 +307,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     public Shape getTransformedShape() {
-        return this.getTransformedShape(cachedTransformedShape, roundrect, this);
+        return this.getTransformedShape(cachedTransformedShape, roundrect);
     }
 
     public static SVGRectFigure newDefaultRectangle() {

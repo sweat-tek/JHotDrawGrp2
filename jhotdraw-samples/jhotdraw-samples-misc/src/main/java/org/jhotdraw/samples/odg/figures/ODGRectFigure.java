@@ -16,11 +16,10 @@ import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.GrowStroke;
 import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.SPI.Rectangle;
-import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -125,7 +124,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = ODGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2;
-        return this.getDrawingArea( this, hitGrowth);
+        return getDrawingArea(hitGrowth);
     }
 
     /**
@@ -156,18 +155,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         return cachedHitShape;
     }
 
-    public Shape getTransformedShape(){
-        return this.getTransformedShape(cachedTransformedShape, roundrect, this);
-    }
-
-    /**
-     * Transforms the figure.
-     *
-     * @param tx The transformation.
-     */
-    @Override
-    public void transform(AffineTransform tx) {
-        this.transform(tx, this);
+    public Shape getTransformedShape() {
+        return this.getTransformedShape(cachedTransformedShape, roundrect);
     }
 
     // ATTRIBUTES
@@ -185,11 +174,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         return new Dimension2DDouble(
                 roundrect.arcwidth / 2d,
                 roundrect.archeight / 2d);
-    }
-
-    @Override
-    public void restoreTransformTo(Object geometry) {
-        this.restoreTransformTo(geometry, this);
     }
 
     @Override

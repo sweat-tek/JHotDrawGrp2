@@ -2,7 +2,6 @@ package org.jhotdraw.samples.SPI;
 
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.draw.AttributeKeys;
-import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.svg.Gradient;
 
@@ -34,40 +33,40 @@ public interface Rectangle extends EllipseRectangle {
 
     void setRoundrect(RoundRectangle2D.Double roundrect);
 
-    default Shape getTransformedShape(Shape cachedTransformedShape, RoundRectangle2D.Double roundrect, Figure figure) {
+    default Shape getTransformedShape(Shape cachedTransformedShape, RoundRectangle2D.Double roundrect) {
         if (cachedTransformedShape == null) {
             if (this.getArcHeight() != 0 || this.getArcWidth() != 0) {
                 return (Shape) roundrect.clone();
             }
             cachedTransformedShape = roundrect.getBounds2D();
 
-            if (figure.get(TRANSFORM) != null) {
-                cachedTransformedShape = figure.get(TRANSFORM).createTransformedShape(cachedTransformedShape);
+            if (this.get(TRANSFORM) != null) {
+                cachedTransformedShape = this.get(TRANSFORM).createTransformedShape(cachedTransformedShape);
             }
         }
         return cachedTransformedShape;
     }
 
-    default void restoreTransformTo(Object geometry, Figure figure) {
+    default void restoreTransformTo(Object geometry) {
         this.invalidateTransformedShape();
         Object[] restoreData = (Object[]) geometry;
         this.setRoundrect((RoundRectangle2D.Double) ((RoundRectangle2D.Double) restoreData[0]).clone());
-        TRANSFORM.setClone(figure, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(figure, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(figure, (Gradient) restoreData[3]);
+        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
+        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
+        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
     }
 
-    default Rectangle2D.Double getDrawingArea(Figure figure, double hitGrowth) {
+    default Rectangle2D.Double getDrawingArea(double hitGrowth) {
         Rectangle2D rx = this.getTransformedShape().getBounds2D();
         Rectangle2D.Double r = (rx instanceof Rectangle2D.Double) ? (Rectangle2D.Double) rx : new Rectangle2D.Double(rx.getX(), rx.getY(), rx.getWidth(), rx.getHeight());
 
-        if (figure.get(TRANSFORM) != null) {
-            double strokeTotalWidth = AttributeKeys.getStrokeTotalWidth(figure, 1.0);
+        if (this.get(TRANSFORM) != null) {
+            double strokeTotalWidth = AttributeKeys.getStrokeTotalWidth(this, 1.0);
             double width = strokeTotalWidth / 2d;
-            if (figure.get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
-                width *= figure.get(STROKE_MITER_LIMIT);
+            if (this.get(STROKE_JOIN) == BasicStroke.JOIN_MITER) {
+                width *= this.get(STROKE_MITER_LIMIT);
             }
-            if (figure.get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
+            if (this.get(STROKE_CAP) != BasicStroke.CAP_BUTT) {
                 width += strokeTotalWidth * 2;
             }
             width++;
@@ -82,36 +81,41 @@ public interface Rectangle extends EllipseRectangle {
         return r;
     }
 
-    default void transform(AffineTransform tx, Figure figure) {
+    /**
+     * Transforms the figure.
+     *
+     * @param tx The transformation.
+     */
+    default void transform(AffineTransform tx) {
         this.invalidateTransformedShape();
 
-        if (figure.get(TRANSFORM) == null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
-            Point2D.Double anchor = figure.getStartPoint();
-            Point2D.Double lead = figure.getEndPoint();
+        if (this.get(TRANSFORM) == null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
+            Point2D.Double anchor = this.getStartPoint();
+            Point2D.Double lead = this.getEndPoint();
 
-            figure.setBounds(
+            this.setBounds(
                     (Point2D.Double) tx.transform(anchor, anchor),
                     (Point2D.Double) tx.transform(lead, lead));
 
-            this.gradientTransform(FILL_GRADIENT, tx, figure);
+            this.gradientTransform(FILL_GRADIENT, tx);
 
-            this.gradientTransform(STROKE_GRADIENT, tx, figure);
+            this.gradientTransform(STROKE_GRADIENT, tx);
 
-            if (figure.get(TRANSFORM) != null) {
-                AffineTransform t = TRANSFORM.getClone(figure);
+            if (this.get(TRANSFORM) != null) {
+                AffineTransform t = TRANSFORM.getClone(this);
                 t.preConcatenate(tx);
-                figure.set(TRANSFORM, t);
+                this.set(TRANSFORM, t);
             }
 
-            figure.set(TRANSFORM, (AffineTransform) tx.clone());
+            this.set(TRANSFORM, (AffineTransform) tx.clone());
         }
     }
 
-    private void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx, Figure figure) {
-        if (figure.get(gradient) != null && !figure.get(gradient).isRelativeToFigureBounds()) {
-            Gradient g = gradient.getClone(figure);
+    private void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx) {
+        if (this.get(gradient) != null && !this.get(gradient).isRelativeToFigureBounds()) {
+            Gradient g = gradient.getClone(this);
             g.transform(tx);
-            figure.set(gradient, g);
+            this.set(gradient, g);
         }
     }
 
