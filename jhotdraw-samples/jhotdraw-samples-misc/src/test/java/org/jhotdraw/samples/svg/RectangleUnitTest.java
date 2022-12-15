@@ -20,18 +20,13 @@ public class RectangleUnitTest {
     private Rectangle rectangle;
     private AffineTransform tx;
 
-    private RectangleFactory rectangleFactory;
-
-    public RectangleUnitTest() {
-        this.rectangleFactory = new RectangleFactory();
-    }
 
     @Before
     public void setUp() {
         /**
          * Instantiate a 10x10 rectangle for testing.
          */
-        rectangle = rectangleFactory.create("SVG");
+        rectangle = RectangleFactory.getInstance().create("SVG");
         tx = new AffineTransform();
         rectangle.setBounds(new Point2D.Double(10, 10), new Point2D.Double(10 + 10, 10 + 10));
     }

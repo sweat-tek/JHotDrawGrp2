@@ -47,7 +47,6 @@ public class ToolsToolBar extends AbstractToolBar {
 
     private static final long serialVersionUID = 1L;
 
-    private final RectangleFactory rectangleFactory;
 
     /**
      * Creates new instance.
@@ -55,7 +54,6 @@ public class ToolsToolBar extends AbstractToolBar {
     public ToolsToolBar() {
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.samples.svg.Labels");
         setName(labels.getString("tools.toolbar"));
-        rectangleFactory = new RectangleFactory();
     }
 
     @Override
@@ -92,7 +90,7 @@ public class ToolsToolBar extends AbstractToolBar {
                 p.add(btn, gbc);
                 labels.configureToolBarButton(btn, "selectionTool");
                 attributes = new HashMap<AttributeKey<?>, Object>();
-                btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(rectangleFactory.create("SVG"), attributes), "createRectangle", labels);
+                btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(RectangleFactory.getInstance().create("SVG"), attributes), "createRectangle", labels);
                 creationTool.setToolDoneAfterCreation(false);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
                 gbc = new GridBagConstraints();
