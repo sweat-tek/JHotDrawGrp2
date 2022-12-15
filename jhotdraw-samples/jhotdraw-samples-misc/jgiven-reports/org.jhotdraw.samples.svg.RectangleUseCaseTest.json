@@ -24,15 +24,15 @@
                   "value": "provide figure"
                 },
                 {
-                  "value": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$72/0x000000080021f440@55e7a35c",
+                  "value": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$79/0x0000000800240440@3a4b0e5d",
                   "argumentInfo": {
                     "argumentName": "testFigureCommand",
-                    "formattedValue": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$72/0x000000080021f440@55e7a35c"
+                    "formattedValue": "org.jhotdraw.samples.svg.RectangleUseCaseTest$$Lambda$79/0x0000000800240440@3a4b0e5d"
                   }
                 }
               ],
               "status": "PASSED",
-              "durationInNanos": 24310700,
+              "durationInNanos": 29699100,
               "depth": 0,
               "parentFailed": false
             },
@@ -48,7 +48,7 @@
                 }
               ],
               "status": "PASSED",
-              "durationInNanos": 1593900,
+              "durationInNanos": 1184100,
               "depth": 0,
               "parentFailed": false
             },
@@ -64,7 +64,7 @@
                 }
               ],
               "status": "PASSED",
-              "durationInNanos": 658100,
+              "durationInNanos": 505600,
               "depth": 0,
               "parentFailed": false
             }
@@ -72,11 +72,11 @@
           "explicitArguments": [],
           "derivedArguments": [],
           "status": "SUCCESS",
-          "durationInNanos": 405896900
+          "durationInNanos": 531441800
         }
       ],
       "casesAsTable": false,
-      "durationInNanos": 405896900
+      "durationInNanos": 531441800
     }
   ],
   "tagMap": {}

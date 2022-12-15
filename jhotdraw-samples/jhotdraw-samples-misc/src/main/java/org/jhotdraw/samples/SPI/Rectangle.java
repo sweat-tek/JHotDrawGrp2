@@ -17,14 +17,6 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
 public interface Rectangle extends EllipseRectangle {
 
-    double getX();
-
-    double getY();
-
-    double getWidth();
-
-    double getHeight();
-
     double getArcWidth();
 
     double getArcHeight();
@@ -32,6 +24,8 @@ public interface Rectangle extends EllipseRectangle {
     void invalidateTransformedShape();
 
     void setRoundrect(RoundRectangle2D.Double roundrect);
+
+    void setArc(double width, double height);
 
     default Shape getTransformedShape(Shape cachedTransformedShape, RoundRectangle2D.Double roundrect) {
         if (cachedTransformedShape == null) {
@@ -118,6 +112,4 @@ public interface Rectangle extends EllipseRectangle {
             this.set(gradient, g);
         }
     }
-
-
 }

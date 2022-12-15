@@ -11,7 +11,7 @@ import org.junit.Test;
 public class RectangleUseCaseTest extends ScenarioTest<GivenFigure, WhenMovingFigure, ThenFigure> {
     @Test
     public void movingRectangleFigure() {
-        TestFigureCommand testFigureCommand = () -> SVGRectFigure.newDefaultRectangle();
+        TestFigureCommand testFigureCommand = SVGRectFigure::new;
         given().provideFigure(testFigureCommand);
         when().movingFigure();
         then().figureHasMoved();

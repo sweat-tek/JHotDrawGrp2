@@ -310,7 +310,4 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         return this.getTransformedShape(cachedTransformedShape, roundrect);
     }
 
-    public static SVGRectFigure newDefaultRectangle() {
-        return new SVGRectFigure();
-    }
 }
