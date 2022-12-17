@@ -36,6 +36,8 @@ import org.jhotdraw.draw.tool.CreationTool;
 import org.jhotdraw.gui.JFileURIChooser;
 import org.jhotdraw.gui.action.ButtonFactory;
 import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
+
+import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.odg.figures.ODGGroupFigure;
 import org.jhotdraw.samples.odg.figures.ODGPathFigure;
 import org.jhotdraw.samples.odg.figures.ODGRectFigure;
@@ -105,7 +107,7 @@ public class ODGApplicationModel extends DefaultApplicationModel {
         ButtonFactory.addSelectionToolTo(tb, editor, createDrawingActions(editor), createSelectionActions(editor));
         tb.addSeparator();
         attributes = new HashMap<AttributeKey<?>, Object>();
-        ButtonFactory.addToolTo(tb, editor, new CreationTool(new ODGRectFigure(), attributes), "edit.createRectangle", drawLabels);
+        ButtonFactory.addToolTo(tb, editor, new CreationTool(RectangleFactory.getInstance().create("ODG"), attributes), "edit.createRectangle", drawLabels);
         attributes = new HashMap<AttributeKey<?>, Object>();
         attributes.put(AttributeKeys.FILL_COLOR, null);
         attributes.put(AttributeKeys.STROKE_COLOR, Color.black);

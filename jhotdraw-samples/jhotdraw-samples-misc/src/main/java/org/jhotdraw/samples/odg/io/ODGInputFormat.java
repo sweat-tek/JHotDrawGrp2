@@ -9,6 +9,8 @@ package org.jhotdraw.samples.odg.io;
 
 import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.figure.CompositeFigure;
+
+import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.geom.*;
 import java.io.*;
@@ -26,6 +28,9 @@ import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.io.StreamPosTokenizer;
 import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
 import static org.jhotdraw.samples.odg.ODGConstants.*;
+
+import org.jhotdraw.samples.SPI.Rectangle;
+import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.odg.figures.ODGBezierFigure;
 import org.jhotdraw.samples.odg.figures.ODGEllipseFigure;
 import org.jhotdraw.samples.odg.figures.ODGFigure;
@@ -572,7 +577,7 @@ public class ODGInputFormat implements InputFormat {
     private ODGFigure createEnhancedGeometryRectangleFigure(
             Rectangle2D.Double bounds, Map<AttributeKey<?>, Object> a)
             throws IOException {
-        ODGRectFigure figure = new ODGRectFigure();
+        ODGRectFigure figure = (ODGRectFigure) RectangleFactory.getInstance().create("ODG");
         figure.setBounds(bounds);
         figure.setAttributes(a);
         return figure;

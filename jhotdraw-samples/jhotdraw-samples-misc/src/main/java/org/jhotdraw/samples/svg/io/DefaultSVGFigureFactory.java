@@ -48,7 +48,7 @@ public class DefaultSVGFigureFactory implements SVGFigureFactory {
 
     @Override
     public Figure createRect(double x, double y, double w, double h, double rx, double ry, Map<AttributeKey<?>, Object> a) {
-        Rectangle figure = RectangleFactory.getInstance().create("SVG");
+        SVGRectFigure figure = (SVGRectFigure) RectangleFactory.getInstance().create("SVG");
         figure.setBounds(new Point2D.Double(x, y), new Point2D.Double(x + w, y + h));
         figure.setArc(rx, ry);
         figure.setAttributes(a);
