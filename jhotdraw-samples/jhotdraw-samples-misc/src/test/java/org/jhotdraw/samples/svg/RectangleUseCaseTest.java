@@ -6,7 +6,6 @@ import org.jhotdraw.samples.svg.behaviourtest.GivenFigure;
 import org.jhotdraw.samples.svg.behaviourtest.TestFigureCommand;
 import org.jhotdraw.samples.svg.behaviourtest.ThenFigure;
 import org.jhotdraw.samples.svg.behaviourtest.WhenMovingFigure;
-import org.jhotdraw.samples.svg.figures.SVGRectFigure;
 import org.junit.Test;
 
 public class RectangleUseCaseTest extends ScenarioTest<GivenFigure, WhenMovingFigure, ThenFigure> {

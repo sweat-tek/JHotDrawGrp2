@@ -20,14 +20,13 @@ public class RectangleFactory implements AbstractFactory<Rectangle> {
 
     @Override
     public Rectangle create(String type) {
-        if (type.equalsIgnoreCase("SVG")) {
-            return new SVGRectFigure();
-        }
-        else if (type.equalsIgnoreCase("ODG")) {
-            return new ODGRectFigure();
-        }
-        else {
-            return null;
+        switch (type) {
+            case "SVG":
+                return new SVGRectFigure();
+            case "ODG":
+                return new ODGRectFigure();
+            default:
+                throw new RuntimeException("No rectangle of type: " + type);
         }
     }
 }

@@ -2,47 +2,48 @@
  * @(#)ODGInputFormat.java
  *
  * Copyright (c) 2007-2008 The authors and contributors of JHotDraw.
- * You may not use, copy or modify this file, except in compliance with the 
+ * You may not use, copy or modify this file, except in compliance with the
  * accompanying license terms.
  */
 package org.jhotdraw.samples.odg.io;
 
-import org.jhotdraw.draw.figure.Figure;
+import org.jhotdraw.draw.AttributeKey;
+import org.jhotdraw.draw.Drawing;
 import org.jhotdraw.draw.figure.CompositeFigure;
-
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.geom.*;
-import java.io.*;
-import java.net.URI;
-import java.util.*;
-import java.util.zip.*;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.jhotdraw.draw.*;
+import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.io.InputFormat;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.io.StreamPosTokenizer;
-import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
-import static org.jhotdraw.samples.odg.ODGConstants.*;
-
-import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.factory.RectangleFactory;
-import org.jhotdraw.samples.odg.figures.ODGBezierFigure;
-import org.jhotdraw.samples.odg.figures.ODGEllipseFigure;
-import org.jhotdraw.samples.odg.figures.ODGFigure;
-import org.jhotdraw.samples.odg.figures.ODGGroupFigure;
-import org.jhotdraw.samples.odg.figures.ODGPathFigure;
-import org.jhotdraw.samples.odg.figures.ODGRectFigure;
+import org.jhotdraw.samples.odg.figures.*;
 import org.jhotdraw.samples.odg.geom.EnhancedPath;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.io.*;
+import java.net.URI;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipInputStream;
+
+import static org.jhotdraw.samples.odg.ODGAttributeKeys.NAME;
+import static org.jhotdraw.samples.odg.ODGAttributeKeys.TRANSFORM;
+import static org.jhotdraw.samples.odg.ODGConstants.*;
 
 /**
  * ODGInputFormat.
@@ -130,7 +131,7 @@ public class ODGInputFormat implements InputFormat {
     private byte[] readAllBytes(InputStream in) throws IOException {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         byte[] buf = new byte[512];
-        for (int len; -1 != (len = in.read(buf));) {
+        for (int len; -1 != (len = in.read(buf)); ) {
             tmp.write(buf, 0, len);
         }
         tmp.close();
@@ -152,7 +153,7 @@ public class ODGInputFormat implements InputFormat {
         boolean isZipped = true;
         try {
             ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(tmp));
-            for (ZipEntry entry; null != (entry = zin.getNextEntry());) {
+            for (ZipEntry entry; null != (entry = zin.getNextEntry()); ) {
                 if ("content.xml".equals(entry.getName())) {
                     contentIn = new ByteArrayInputStream(
                             readAllBytes(zin));
@@ -500,7 +501,7 @@ public class ODGInputFormat implements InputFormat {
          * <draw:custom-shape> element if its draw:engine attribute has been
          * omitted.
          */
- /* The draw:type attribute contains the name of a shape type. This name
+        /* The draw:type attribute contains the name of a shape type. This name
          * can be used to offer specialized user interfaces for certain classes
          * of shapes, like for arrows, smileys, etc.
          * The shape type is rendering engine dependent and does not influence
@@ -691,7 +692,6 @@ public class ODGInputFormat implements InputFormat {
      * properties are stored in styles belonging to the graphic family. The way
      * a frame is contained in a document also is the same as for drawing shapes.
      *
-     *
      * @param elem A &lt;frame&gt; element.
      */
     private ODGFigure readFrameElement(Element elem) throws IOException {
@@ -802,7 +802,6 @@ public class ODGInputFormat implements InputFormat {
      * • Event listeners – see section 9.2.21.
      * • Glue points – see section 9.2.19.
      * • Text – see section 9.2.17.
-     *
      */
     private ODGFigure readPolygonElement(Element elem)
             throws IOException {
@@ -963,7 +962,7 @@ public class ODGInputFormat implements InputFormat {
 
     /**
      * Returns a value as a EnhancedPath array.
-     *
+     * <p>
      * The draw:enhanced-path attribute specifies a path similar to the svg:d attribute of the
      * <svg:path> element. Instructions such as moveto, lineto, arcto and other instructions
      * together with its parameter are describing the geometry of a shape which can be filled and or
@@ -982,7 +981,6 @@ public class ODGInputFormat implements InputFormat {
      * draw:formula attribute is used as parameter value in this case.
      * • If “$” is preceding a integer value, the value is indexing a draw:modifiers attribute. The
      * corresponding modifier value is used as parameter value then.
-     *
      */
     private EnhancedPath toEnhancedPath(String str) throws IOException {
         if (DEBUG) {
@@ -1224,22 +1222,22 @@ public class ODGInputFormat implements InputFormat {
      */
     private Object nextEnhancedCoordinate(StreamPosTokenizer tt, String str) throws IOException {
         switch (tt.nextToken()) {
-            case '?': 
+            case '?':
                 StringBuilder buf = new StringBuilder();
                 buf.append('?');
                 int ch = tt.nextChar();
                 for (; ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9';
-                        ch = tt.nextChar()) {
+                     ch = tt.nextChar()) {
                     buf.append((char) ch);
                 }
                 tt.pushCharBack(ch);
                 return buf.toString();
-            case '$': 
+            case '$':
                 buf = new StringBuilder();
                 buf.append('$');
                 ch = tt.nextChar();
                 for (; ch >= '0' && ch <= '9';
-                        ch = tt.nextChar()) {
+                     ch = tt.nextChar()) {
                     buf.append((char) ch);
                 }
                 tt.pushCharBack(ch);
@@ -1439,7 +1437,7 @@ public class ODGInputFormat implements InputFormat {
     /**
      * Returns a value as a BezierPath array.
      * as specified in http://www.w3.org/TR/SVGMobile12/shapes.html#PointsBNF
-     *
+     * <p>
      * Also supports elliptical arc commands 'a' and 'A' as specified in
      * http://www.w3.org/TR/SVG/paths.html#PathDataEllipticalArcCommands
      */
@@ -1793,7 +1791,7 @@ public class ODGInputFormat implements InputFormat {
 
                     break;
 
-                case 'A': 
+                case 'A':
                     // absolute-elliptical-arc rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
                         throw new IOException("rx coordinate missing for 'A' at position " + tt.getStartPosition() + " in " + str);
@@ -1831,7 +1829,7 @@ public class ODGInputFormat implements InputFormat {
                     nextCommand = 'A';
                     break;
 
-                case 'a': 
+                case 'a':
                     // absolute-elliptical-arc rx ry x-axis-rotation large-arc-flag sweep-flag x y
                     if (tt.nextToken() != StreamPosTokenizer.TT_NUMBER) {
                         throw new IOException("rx coordinate missing for 'A' at position " + tt.getStartPosition() + " in " + str);
