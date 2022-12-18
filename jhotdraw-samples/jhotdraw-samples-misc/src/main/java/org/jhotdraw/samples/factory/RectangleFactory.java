@@ -4,7 +4,7 @@ import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.odg.figures.ODGRectFigure;
 import org.jhotdraw.samples.svg.figures.SVGRectFigure;
 
-public class RectangleFactory implements AbstractFactory<Rectangle> {
+public class RectangleFactory implements AbstractFigureFactory<Rectangle> {
 
     private static RectangleFactory rectangleFactory;
 
