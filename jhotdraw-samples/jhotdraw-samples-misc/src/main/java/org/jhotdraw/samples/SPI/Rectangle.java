@@ -81,28 +81,29 @@ public interface Rectangle extends EllipseRectangle {
      * @param tx The transformation.
      */
     default void transform(AffineTransform tx) {
-        this.invalidateTransformedShape();
+        invalidateTransformedShape();
 
-        if (this.get(TRANSFORM) == null || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
-            Point2D.Double anchor = this.getStartPoint();
-            Point2D.Double lead = this.getEndPoint();
-
-            this.setBounds(
+        if (get(TRANSFORM) == null
+                ||
+                (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) == tx.getType()) {
+            Point2D.Double anchor = getStartPoint();
+            Point2D.Double lead = getEndPoint();
+            setBounds(
                     (Point2D.Double) tx.transform(anchor, anchor),
                     (Point2D.Double) tx.transform(lead, lead));
 
-            this.gradientTransform(FILL_GRADIENT, tx);
+            gradientTransform(FILL_GRADIENT, tx);
+            gradientTransform(STROKE_GRADIENT, tx);
 
-            this.gradientTransform(STROKE_GRADIENT, tx);
-
-            if (this.get(TRANSFORM) != null) {
-                AffineTransform t = TRANSFORM.getClone(this);
-                t.preConcatenate(tx);
-                this.set(TRANSFORM, t);
-            }
-
-            this.set(TRANSFORM, (AffineTransform) tx.clone());
+            return;
         }
+        if (get(TRANSFORM) != null) {
+            AffineTransform t = TRANSFORM.getClone(this);
+            t.preConcatenate(tx);
+            set(TRANSFORM, t);
+            return;
+        }
+        set(TRANSFORM, (AffineTransform) tx.clone());
     }
 
     private void gradientTransform(AttributeKey<Gradient> gradient, AffineTransform tx) {
