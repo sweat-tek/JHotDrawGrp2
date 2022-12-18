@@ -1,6 +1,7 @@
 package org.jhotdraw.samples.svg;
 
 import org.jhotdraw.draw.AttributeKey;
+import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.svg.figures.SVGRectFigure;
 import org.junit.Assert;
@@ -60,7 +61,7 @@ public class RectangleUnitTest {
 
     }
 
-    private SVGRectFigure moveRectangle(double x, double y) {
+    private Rectangle moveRectangle(double x, double y) {
         tx.translate(x, y);
         rectangle.transform(tx);
         return rectangle;
