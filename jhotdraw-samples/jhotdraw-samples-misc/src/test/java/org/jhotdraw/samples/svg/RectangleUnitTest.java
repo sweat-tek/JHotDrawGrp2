@@ -3,7 +3,6 @@ package org.jhotdraw.samples.svg;
 import org.jhotdraw.draw.AttributeKey;
 import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.factory.RectangleFactory;
-import org.jhotdraw.samples.svg.figures.SVGRectFigure;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +17,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
 
 public class RectangleUnitTest {
 
-    private SVGRectFigure rectangle;
+    private Rectangle rectangle;
     private AffineTransform tx;
 
 
@@ -27,7 +26,7 @@ public class RectangleUnitTest {
         /**
          * Instantiate a 10x10 rectangle for testing.
          */
-        rectangle = (SVGRectFigure) RectangleFactory.getInstance().create("SVG");
+        rectangle = RectangleFactory.getInstance().create("SVG");
         tx = new AffineTransform();
         rectangle.setBounds(new Point2D.Double(10, 10), new Point2D.Double(10 + 10, 10 + 10));
     }

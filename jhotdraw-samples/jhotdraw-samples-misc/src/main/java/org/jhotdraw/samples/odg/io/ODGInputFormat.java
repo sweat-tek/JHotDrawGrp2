@@ -14,6 +14,7 @@ import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.draw.io.InputFormat;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.io.StreamPosTokenizer;
+import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.odg.figures.*;
 import org.jhotdraw.samples.odg.geom.EnhancedPath;
@@ -360,7 +361,7 @@ public class ODGInputFormat implements InputFormat {
         NodeList list = elem.getChildNodes();
         for (int i = 0; i < list.getLength(); i++) {
             Element child = (Element) list.item(i);
-            ODGFigure figure = readElement(child);
+            Figure figure = readElement(child);
             if (figure != null) {
                 figures.add(figure);
             }
@@ -370,7 +371,7 @@ public class ODGInputFormat implements InputFormat {
     /**
      * Reads an ODG element.
      */
-    private ODGFigure readElement(Element elem)
+    private Figure readElement(Element elem)
             throws IOException {
         /*
         Drawing Shapes
@@ -397,7 +398,7 @@ public class ODGInputFormat implements InputFormat {
         </choice>
         </define>
          */
-        ODGFigure f = null;
+        Figure f = null;
         if (elem.getPrefix() == null
                 || elem.getPrefix().equals(DRAWING_NAMESPACE)) {
             String name = elem.getLocalName();
@@ -436,14 +437,16 @@ public class ODGInputFormat implements InputFormat {
             }
         }
         if (f != null) {
-            if (f.isEmpty()) {
-                if (DEBUG) {
-                    System.out.println("ODGInputFormat.readElement():null - discarded empty figure " + f);
+            if (f instanceof ODGFigure) {
+                if (((ODGFigure) f).isEmpty()) {
+                    if (DEBUG) {
+                        System.out.println("ODGInputFormat.readElement():null - discarded empty figure " + f);
+                    }
+                    return null;
                 }
-                return null;
-            }
-            if (DEBUG) {
-                System.out.println("ODGInputFormat.readElement():" + f + ".");
+                if (DEBUG) {
+                    System.out.println("ODGInputFormat.readElement():" + f + ".");
+                }
             }
         }
         return f;
@@ -467,7 +470,7 @@ public class ODGInputFormat implements InputFormat {
      * interfaces, for instance by displaying interaction handles, that
      * provide a simple way to modify the geometry.
      */
-    private ODGFigure readCustomShapeElement(Element elem)
+    private Figure readCustomShapeElement(Element elem)
             throws IOException {
         String styleName = elem.getAttributeNS(DRAWING_NAMESPACE, "style-name");
         Map<AttributeKey<?>, Object> a = styles.getAttributes(styleName, "graphic");
@@ -482,7 +485,7 @@ public class ODGInputFormat implements InputFormat {
                 toLength(Optional.ofNullable(elem.getAttributeNS(SVG_NAMESPACE, "height"))
                         .orElse("0"), 1));
 
-        ODGFigure figure = null;
+        Figure figure = null;
         NodeList list = elem.getElementsByTagNameNS(DRAWING_NAMESPACE, "enhanced-geometry");
         for (int i = 0; i < list.getLength(); i++) {
             Element child = (Element) list.item(i);
@@ -492,7 +495,7 @@ public class ODGInputFormat implements InputFormat {
         return figure;
     }
 
-    private ODGFigure readEnhancedGeometryElement(
+    private Figure readEnhancedGeometryElement(
             Element elem,
             Map<AttributeKey<?>, Object> a,
             Rectangle2D.Double figureBounds)
@@ -547,7 +550,7 @@ public class ODGInputFormat implements InputFormat {
         // FIXME - Implement Extrusion Allowed
         // FIXME - Implement Text Path Allowed
         // FIXME - Implement Concentric Gradient Allowed
-        ODGFigure figure;
+        Figure figure;
         if ("rectangle".equals(type)) {
             figure = createEnhancedGeometryRectangleFigure(figureBounds, a);
         } else if ("ellipse".equals(type)) {
@@ -575,11 +578,10 @@ public class ODGInputFormat implements InputFormat {
     /**
      * Creates a Rect figure.
      */
-    private ODGFigure createEnhancedGeometryRectangleFigure(
-            Rectangle2D.Double bounds, Map<AttributeKey<?>, Object> a)
-            throws IOException {
-        ODGRectFigure figure = (ODGRectFigure) RectangleFactory.getInstance().create("ODG");
-        figure.setBounds(bounds);
+    private Figure createEnhancedGeometryRectangleFigure(
+            Rectangle2D.Double bounds, Map<AttributeKey<?>, Object> a) {
+        Rectangle figure = RectangleFactory.getInstance().create("ODG");
+        figure.setBounds(new Point2D.Double(bounds.x, bounds.y), new Point2D.Double(bounds.x + bounds.width, bounds.y + bounds.height));
         figure.setAttributes(a);
         return figure;
     }
