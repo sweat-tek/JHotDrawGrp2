@@ -24,11 +24,11 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.GrowStroke;
-import org.jhotdraw.samples.adapter.RectImageAdapter;
+import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 
-import org.jhotdraw.samples.util.RectImageUtil;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.util.*;
 
 /**
@@ -37,7 +37,7 @@ import org.jhotdraw.util.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, ImageHolderFigure, RectImageAdapter {
+public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, ImageHolderFigure, RectImage {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -161,7 +161,7 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        RectImageUtil imageUtil = new RectImageUtil();
+        RectImageBridge imageUtil = new RectImageBridge();
         imageUtil.setBounds(anchor, lead, this, this.rectangle);
     }
 

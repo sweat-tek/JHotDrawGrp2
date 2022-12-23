@@ -1,8 +1,7 @@
-package org.jhotdraw.samples.util;
+package org.jhotdraw.samples.bridge;
 
 import org.jhotdraw.draw.figure.AbstractFigure;
 import org.jhotdraw.draw.figure.Figure;
-import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
 import org.jhotdraw.samples.svg.Gradient;
 
 import java.awt.geom.AffineTransform;
@@ -13,9 +12,9 @@ import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
-public class EllipseUtil {
+public class EllipseBridge {
 
-    public void transform(AffineTransform tx, EllipseFigureAdapter ellipseFigure, AbstractFigure abstractFigure){
+    public void transform(AffineTransform tx, org.jhotdraw.samples.SPI.Ellipse ellipseFigure, AbstractFigure abstractFigure) {
         if (ellipseFigure.get(TRANSFORM) != null
                 || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
             if (ellipseFigure.get(TRANSFORM) == null) {
@@ -47,7 +46,7 @@ public class EllipseUtil {
         ellipseFigure.invalidate();
     }
 
-    public void restoreTransformTo(Object geometry, EllipseFigureAdapter ellipseFigureAdapter, Ellipse2D.Double ellipse) {
+    public void restoreTransformTo(Object geometry, org.jhotdraw.samples.SPI.Ellipse ellipseFigureAdapter, Ellipse2D.Double ellipse) {
         Object[] restoreData = (Object[]) geometry;
         ellipse = (Ellipse2D.Double) ((Ellipse2D.Double) restoreData[0]).clone();
         TRANSFORM.setClone((Figure) ellipseFigureAdapter, (AffineTransform) restoreData[1]);

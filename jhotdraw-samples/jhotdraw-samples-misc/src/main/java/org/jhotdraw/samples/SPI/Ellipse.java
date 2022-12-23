@@ -1,10 +1,10 @@
-package org.jhotdraw.samples.adapter;
+package org.jhotdraw.samples.SPI;
 
 import org.jhotdraw.draw.AttributeKey;
 
 import java.awt.geom.Point2D;
 
-public interface EllipseFigureAdapter {
+public interface Ellipse extends EllipseRectangle {
 
     public <T> T get(AttributeKey<T> key);
 

@@ -22,9 +22,9 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
+import org.jhotdraw.samples.SPI.Ellipse;
+import org.jhotdraw.samples.bridge.EllipseBridge;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
-import org.jhotdraw.samples.util.EllipseUtil;
 
 import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
 
@@ -34,12 +34,12 @@ import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, EllipseFigureAdapter {
+public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, Ellipse {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
 
-    private EllipseUtil ellipseUtil = new EllipseUtil();
+    private EllipseBridge ellipseBridge = new EllipseBridge();
     /**
      * This is used to perform faster drawing and hit testing.
      */
@@ -125,7 +125,7 @@ public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, 
         return getTransformedShape().contains(p);
     }
 
-    private Shape getTransformedShape() {
+    public Shape getTransformedShape() {
         if (cachedTransformedShape == null) {
             if (get(TRANSFORM) == null) {
                 cachedTransformedShape = ellipse;
@@ -151,12 +151,12 @@ public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, 
      */
     @Override
     public void transform(AffineTransform tx) {
-        ellipseUtil.transform(tx, this, this);
+        ellipseBridge.transform(tx, this, this);
     }
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        ellipseUtil.restoreTransformTo(geometry, this, ellipse);
+        ellipseBridge.restoreTransformTo(geometry, this, ellipse);
     }
 
     @Override

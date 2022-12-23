@@ -14,14 +14,12 @@ import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Dimension2DDouble;
 import org.jhotdraw.geom.GrowStroke;
-import org.jhotdraw.samples.adapter.RectImageAdapter;
-import org.jhotdraw.samples.adapter.RectangleAdapter;
+import org.jhotdraw.samples.SPI.RectImage;
+import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.odg.ODGAttributeKeys;
-import org.jhotdraw.samples.util.RectImageUtil;
-import org.jhotdraw.samples.util.RectUtil;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
@@ -38,7 +36,7 @@ import static org.jhotdraw.samples.odg.ODGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, RectangleAdapter, RectImageAdapter {
+public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rectangle, RectImage {
 
     private static final long serialVersionUID = 1L;
     private RoundRectangle2D.Double roundrect;
@@ -57,7 +55,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
      */
     private transient Shape cachedHitShape;
 
-    private final RectUtil rectUtil;
 
     /**
      * Creates a new instance.
@@ -72,7 +69,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     public ODGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
-        this.rectUtil = new RectUtil();
         ODGAttributeKeys.setDefaults(this);
     }
 
@@ -128,7 +124,7 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = ODGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2;
-        return rectUtil.getDrawingArea(this, this, hitGrowth);
+        return getDrawingArea(hitGrowth);
     }
 
     /**
@@ -141,17 +137,13 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        RectImageUtil imageUtil = new RectImageUtil();
+        RectImageBridge imageUtil = new RectImageBridge();
         imageUtil.setBounds(anchor, lead, this, this.roundrect);
     }
 
     public void invalidateTransformedShape() {
         cachedTransformedShape = null;
         cachedHitShape = null;
-    }
-
-    public Shape getTransformedShape() {
-        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this);
     }
 
     private Shape getHitShape() {
@@ -163,14 +155,8 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         return cachedHitShape;
     }
 
-    /**
-     * Transforms the figure.
-     *
-     * @param tx The transformation.
-     */
-    @Override
-    public void transform(AffineTransform tx) {
-        rectUtil.transform(tx, this, this);
+    public Shape getTransformedShape() {
+        return this.getTransformedShape(cachedTransformedShape, roundrect);
     }
 
     // ATTRIBUTES
@@ -188,11 +174,6 @@ public class ODGRectFigure extends ODGAttributedFigure implements ODGFigure, Rec
         return new Dimension2DDouble(
                 roundrect.arcwidth / 2d,
                 roundrect.archeight / 2d);
-    }
-
-    @Override
-    public void restoreTransformTo(Object geometry) {
-        rectUtil.restoreTransformTo(geometry, this, this);
     }
 
     @Override
