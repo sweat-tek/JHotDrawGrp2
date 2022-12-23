@@ -19,11 +19,11 @@ public class RectangleFactory implements AbstractFigureFactory<Rectangle> {
     }
 
     @Override
-    public Rectangle create(String type) {
+    public Rectangle create(Type type) {
         switch (type) {
-            case "SVG":
+            case SVG:
                 return new SVGRectFigure();
-            case "ODG":
+            case ODG:
                 return new ODGRectFigure();
             default:
                 throw new RuntimeException("No rectangle of type: " + type);

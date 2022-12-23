@@ -15,6 +15,7 @@ import org.jhotdraw.draw.io.InputFormat;
 import org.jhotdraw.geom.BezierPath;
 import org.jhotdraw.io.StreamPosTokenizer;
 import org.jhotdraw.samples.SPI.Rectangle;
+import org.jhotdraw.samples.factory.AbstractFigureFactory;
 import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.odg.figures.*;
 import org.jhotdraw.samples.odg.geom.EnhancedPath;
@@ -580,7 +581,7 @@ public class ODGInputFormat implements InputFormat {
      */
     private Figure createEnhancedGeometryRectangleFigure(
             Rectangle2D.Double bounds, Map<AttributeKey<?>, Object> a) {
-        Rectangle figure = RectangleFactory.getInstance().create("ODG");
+        Rectangle figure = RectangleFactory.getInstance().create(AbstractFigureFactory.Type.ODG);
         figure.setBounds(new Point2D.Double(bounds.x, bounds.y), new Point2D.Double(bounds.x + bounds.width, bounds.y + bounds.height));
         figure.setAttributes(a);
         return figure;

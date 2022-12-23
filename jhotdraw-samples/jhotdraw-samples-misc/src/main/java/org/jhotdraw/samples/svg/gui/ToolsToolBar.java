@@ -18,6 +18,7 @@ import org.jhotdraw.draw.tool.TextAreaCreationTool;
 import org.jhotdraw.draw.tool.TextCreationTool;
 import org.jhotdraw.gui.action.ButtonFactory;
 import org.jhotdraw.gui.plaf.palette.PaletteButtonUI;
+import org.jhotdraw.samples.factory.AbstractFigureFactory;
 import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.svg.PathTool;
 import org.jhotdraw.samples.svg.SVGCreateFromFileTool;
@@ -90,7 +91,7 @@ public class ToolsToolBar extends AbstractToolBar {
                 p.add(btn, gbc);
                 labels.configureToolBarButton(btn, "selectionTool");
                 attributes = new HashMap<AttributeKey<?>, Object>();
-                btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(RectangleFactory.getInstance().create("SVG"), attributes), "createRectangle", labels);
+                btn = ButtonFactory.addToolTo(this, editor, creationTool = new CreationTool(RectangleFactory.getInstance().create(AbstractFigureFactory.Type.SVG), attributes), "createRectangle", labels);
                 creationTool.setToolDoneAfterCreation(false);
                 btn.setUI((PaletteButtonUI) PaletteButtonUI.createUI(btn));
                 gbc = new GridBagConstraints();

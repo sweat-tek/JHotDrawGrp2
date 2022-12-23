@@ -18,8 +18,7 @@ public class GivenFigure extends Stage<GivenFigure> {
         editor.setActiveView(view);
     }
 
-    public GivenFigure provideFigure(TestFigureCommand testFigureCommand) {
-        Figure figure = testFigureCommand.execute();
+    public GivenFigure provideFigure(Figure figure) {
         editor.getActiveView().getDrawing().add(figure);
 
         return this;
