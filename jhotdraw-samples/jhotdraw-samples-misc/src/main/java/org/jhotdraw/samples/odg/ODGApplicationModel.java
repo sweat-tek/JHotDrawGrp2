@@ -7,16 +7,7 @@
  */
 package org.jhotdraw.samples.odg;
 
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.*;
-import javax.swing.*;
-import org.jhotdraw.action.edit.CopyAction;
-import org.jhotdraw.action.edit.CutAction;
-import org.jhotdraw.action.edit.DuplicateAction;
-import org.jhotdraw.action.edit.PasteAction;
-import org.jhotdraw.action.edit.SelectAllAction;
+import org.jhotdraw.action.edit.*;
 import org.jhotdraw.action.view.ToggleViewPropertyAction;
 import org.jhotdraw.action.view.ViewPropertyAction;
 import org.jhotdraw.api.app.Application;
@@ -35,13 +26,23 @@ import org.jhotdraw.draw.io.OutputFormat;
 import org.jhotdraw.draw.tool.CreationTool;
 import org.jhotdraw.gui.JFileURIChooser;
 import org.jhotdraw.gui.action.ButtonFactory;
-import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
+import org.jhotdraw.samples.factory.AbstractFigureFactory;
+import org.jhotdraw.samples.factory.RectangleFactory;
 import org.jhotdraw.samples.odg.figures.ODGGroupFigure;
 import org.jhotdraw.samples.odg.figures.ODGPathFigure;
-import org.jhotdraw.samples.odg.figures.ODGRectFigure;
 import org.jhotdraw.samples.svg.action.CombineAction;
 import org.jhotdraw.samples.svg.action.SplitAction;
-import org.jhotdraw.util.*;
+import org.jhotdraw.util.ResourceBundleUtil;
+
+import javax.swing.*;
+import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import static org.jhotdraw.samples.odg.ODGAttributeKeys.*;
 
 /**
  * Provides meta-data and factory methods for an application.
@@ -105,7 +106,7 @@ public class ODGApplicationModel extends DefaultApplicationModel {
         ButtonFactory.addSelectionToolTo(tb, editor, createDrawingActions(editor), createSelectionActions(editor));
         tb.addSeparator();
         attributes = new HashMap<AttributeKey<?>, Object>();
-        ButtonFactory.addToolTo(tb, editor, new CreationTool(new ODGRectFigure(), attributes), "edit.createRectangle", drawLabels);
+        ButtonFactory.addToolTo(tb, editor, new CreationTool(RectangleFactory.getInstance().create(AbstractFigureFactory.Type.ODG), attributes), "edit.createRectangle", drawLabels);
         attributes = new HashMap<AttributeKey<?>, Object>();
         attributes.put(AttributeKeys.FILL_COLOR, null);
         attributes.put(AttributeKeys.STROKE_COLOR, Color.black);

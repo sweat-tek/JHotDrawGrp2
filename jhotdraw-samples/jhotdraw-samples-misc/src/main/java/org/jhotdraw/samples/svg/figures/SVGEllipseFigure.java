@@ -14,11 +14,10 @@ import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.samples.adapter.EllipseFigureAdapter;
-import org.jhotdraw.samples.adapter.SharedAdapter;
+import org.jhotdraw.samples.SPI.Ellipse;
+import org.jhotdraw.samples.bridge.EllipseBridge;
+import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import org.jhotdraw.samples.util.EllipseUtil;
-import org.jhotdraw.samples.util.SharedUtil;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
@@ -39,21 +38,22 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, SharedAdapter, EllipseFigureAdapter {
+
+public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, Ellipse {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
     /**
      * This is used to perform faster drawing and hit testing.
      */
-    private transient Shape cachedTransformedShape;
+    private transient java.awt.Shape cachedTransformedShape;
     /**
      * This is used to perform faster hit testing.
      */
-    private transient Shape cachedHitShape;
+    private transient java.awt.Shape cachedHitShape;
+    private final EllipseRectangleBridge ellipseRectangleBridge;
 
-    private final SharedUtil sharedUtil;
-    private final EllipseUtil ellipseUtil;
+    private final EllipseBridge ellipseBridge;
 
     /**
      * Creates a new instance.
@@ -65,8 +65,8 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
-        this.sharedUtil = new SharedUtil();
-        this.ellipseUtil = new EllipseUtil();
+        this.ellipseRectangleBridge = new EllipseRectangleBridge();
+        this.ellipseBridge = new EllipseBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -144,7 +144,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     }
 
     private Shape getHitShape() {
-        return sharedUtil.getHitShape(cachedHitShape, this, this);
+        return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
     }
 
     @Override
@@ -164,12 +164,12 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @Override
     @FeatureEntryPoint("EllipseTransform")
     public void transform(AffineTransform tx) {
-        ellipseUtil.transform(tx, this, this);
+        ellipseBridge.transform(tx, this, this);
     }
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        ellipseUtil.restoreTransformTo(geometry, this, ellipse);
+        ellipseBridge.restoreTransformTo(geometry, this, ellipse);
     }
 
     @Override

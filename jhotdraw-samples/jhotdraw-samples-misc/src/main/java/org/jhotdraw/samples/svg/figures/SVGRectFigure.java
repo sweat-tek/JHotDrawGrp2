@@ -12,14 +12,17 @@ import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
 import org.jhotdraw.draw.handle.ResizeHandleKit;
 import org.jhotdraw.draw.handle.TransformHandleKit;
-import org.jhotdraw.samples.adapter.RectangleAdapter;
-import org.jhotdraw.samples.svg.Gradient;
+import org.jhotdraw.samples.SPI.RectImage;
+import org.jhotdraw.samples.SPI.Rectangle;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import org.jhotdraw.samples.util.RectUtil;
-import org.jhotdraw.samples.util.SharedUtil;
+import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
+import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -33,7 +36,7 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, RectangleAdapter {
+public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rectangle, RectImage {
 
     private static final long serialVersionUID = 1L;
     /**
@@ -76,9 +79,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
      */
     private transient Shape cachedHitShape;
 
-    private final RectUtil rectUtil;
-
-    private final SharedUtil sharedUtil;
+    private final EllipseRectangleBridge ellipseRectangleBridge;
 
     /**
      * Creates a new instance.
@@ -94,8 +95,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @FeatureEntryPoint(value = "RectangleConstructor")
     public SVGRectFigure(double x, double y, double width, double height, double rx, double ry) {
         roundrect = new RoundRectangle2D.Double(x, y, width, height, rx, ry);
-        this.rectUtil = new RectUtil();
-        this.sharedUtil = new SharedUtil();
+        this.ellipseRectangleBridge = new EllipseRectangleBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -112,15 +112,15 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        if (roundrect.archeight == 0 && roundrect.arcwidth == 0) {
-            g.draw(roundrect.getBounds2D());
-        } else {
+        if (roundrect.archeight != 0 && roundrect.arcwidth != 0) {
             // We have to generate the path for the round rectangle manually,
             // because the path of a Java RoundRectangle is drawn counter clockwise
             // whereas an SVG rect needs to be drawn clockwise.
             Path2D.Double p = initDrawStroke();
             g.draw(p);
+            return;
         }
+        g.draw(roundrect.getBounds2D());
     }
 
     private Path2D.Double initDrawStroke() {
@@ -128,48 +128,35 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         double aw = roundrect.arcwidth / 2d;
         double ah = roundrect.archeight / 2d;
 
+        return generateStrokeLineAndCurve(p, aw, ah);
+    }
+
+    private Path2D.Double generateStrokeLineAndCurve(Path2D.Double p, double aw, double ah) {
         p.moveTo((roundrect.x + aw), (float) roundrect.y);
-        this.generateFirstStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y, aw, ah);
-        this.generateSecondStrokeLineAndCurve(p, roundrect.x - roundrect.width, roundrect.y + roundrect.height, aw, ah);
-        this.generateThirdStrokeLineAndCurve(p, roundrect.x, roundrect.y + roundrect.height, aw, ah);
-        this.generateFinalStrokeLineAndCurve(p, roundrect.x, roundrect.y, aw, ah);
 
-        p.closePath();
-        return p;
-    }
+        p.lineTo((roundrect.x + roundrect.width - aw), (float) roundrect.y);
+        p.curveTo((roundrect.x + roundrect.width - aw * ACV), (float) roundrect.y,
+                (roundrect.x + roundrect.width), (float) (roundrect.y + ah * ACV),
+                (roundrect.x + roundrect.width), (roundrect.y + ah));
 
+        p.lineTo((roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah));
+        p.curveTo(
+                (roundrect.x + roundrect.width), (roundrect.y + roundrect.height - ah * ACV),
+                (roundrect.x + roundrect.width - aw * ACV), (roundrect.y + roundrect.height),
+                (roundrect.x + roundrect.width - aw), (roundrect.y + roundrect.height));
 
-    private void generateFirstStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double y, double aw, double ah) {
-        p.lineTo(xAndWidth - aw, (float) y);
-        p.curveTo((xAndWidth - aw * ACV), (float) y,
-                xAndWidth, (float) (y + ah * ACV),
-                xAndWidth, (y + ah));
-    }
-
-    private void generateSecondStrokeLineAndCurve(Path2D.Double p, double xAndWidth, double yAndHeight, double aw, double ah) {
-        p.lineTo(xAndWidth, (yAndHeight - ah));
-        p.curveTo((xAndWidth), (float) (yAndHeight - ah * ACV),
-                (xAndWidth - aw * ACV), (float) (yAndHeight),
-                (xAndWidth - aw), (yAndHeight));
-    }
-
-    private void generateThirdStrokeLineAndCurve(Path2D.Double p, double x, double yAndHeight, double aw, double ah) {
-        p.lineTo((x + aw), (yAndHeight));
-        p.curveTo((x + aw * ACV), (yAndHeight),
-                (x), (float) (yAndHeight - ah * ACV),
-                (float) (x), (yAndHeight - ah));
-    }
-
-    private void generateFinalStrokeLineAndCurve(Path2D.Double p, double x, double y, double aw, double ah) {
-        p.lineTo((float) x, (y + ah));
-        p.curveTo((x), (y + ah * ACV),
-                (x + aw * ACV), (float) (y),
-                (float) (x + aw), (float) (y));
+        p.lineTo((roundrect.x + aw), (roundrect.y + roundrect.height));
+        p.curveTo((roundrect.x + aw * ACV), (roundrect.y + roundrect.height),
+                (roundrect.x), (roundrect.y + roundrect.height - ah * ACV),
+                (float) roundrect.x, (roundrect.y + roundrect.height - ah));
 
         p.lineTo((float) roundrect.x, (roundrect.y + ah));
         p.curveTo((roundrect.x), (roundrect.y + ah * ACV),
                 (roundrect.x + aw * ACV), (float) (roundrect.y),
                 (float) (roundrect.x + aw), (float) (roundrect.y));
+
+        p.closePath();
+        return p;
     }
 
 
@@ -238,7 +225,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     @Override
     public Rectangle2D.Double getDrawingArea() {
         double hitGrowth = SVGAttributeKeys.getPerpendicularHitGrowth(this, 1.0) * 2d + 1d;
-        return rectUtil.getDrawingArea(this, this, hitGrowth);
+        return getDrawingArea(hitGrowth);
     }
 
     /**
@@ -251,12 +238,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
 
     @Override
     public void setBounds(Point2D.Double anchor, Point2D.Double lead) {
-        invalidateTransformedShape();
-        roundrect.x = Math.min(anchor.x, lead.x);
-        roundrect.y = Math.min(anchor.y, lead.y);
-        roundrect.width = Math.max(0.1, Math.abs(lead.x - anchor.x));
-        roundrect.height = Math.max(0.1, Math.abs(lead.y - anchor.y));
-        invalidate();
+
+        RectImageBridge imageUtil = new RectImageBridge();
+        imageUtil.setBounds(anchor, lead, this, this.roundrect);
     }
 
     public void invalidateTransformedShape() {
@@ -264,33 +248,8 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         cachedHitShape = null;
     }
 
-    public Shape getTransformedShape() {
-        return rectUtil.getTransformedShape(cachedTransformedShape, roundrect, this);
-    }
-
     private Shape getHitShape() {
-        return sharedUtil.getHitShape(cachedHitShape, this, this);
-    }
-
-    /**
-     * Transforms the figure.
-     *
-     * @param tx The transformation.
-     */
-    @FeatureEntryPoint(value = "RectangleMove")
-    @Override
-    public void transform(AffineTransform tx) {
-        rectUtil.transform(tx, this, this);
-    }
-
-    @Override
-    public void restoreTransformTo(Object geometry) {
-        invalidateTransformedShape();
-        Object[] restoreData = (Object[]) geometry;
-        roundrect = (RoundRectangle2D.Double) ((RoundRectangle2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
+        return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
     }
 
     @Override
@@ -305,7 +264,7 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
     // EDITING
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
+        LinkedList<Handle> handles = new LinkedList<>();
         switch (detailLevel % 2) {
             case -1: // Mouse hover handles
                 handles.add(new BoundsOutlineHandle(this, false, true));
@@ -346,7 +305,9 @@ public class SVGRectFigure extends SVGAttributedFigure implements SVGFigure, Rec
         invalidateTransformedShape();
     }
 
-    public static SVGRectFigure newDefaultRectangle() {
-        return new SVGRectFigure();
+    @Override
+    public Shape getTransformedShape() {
+        return this.getTransformedShape(cachedTransformedShape, roundrect);
     }
+
 }
