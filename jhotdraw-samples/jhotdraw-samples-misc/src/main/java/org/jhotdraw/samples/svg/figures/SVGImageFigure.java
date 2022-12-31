@@ -28,6 +28,7 @@ import org.jhotdraw.samples.SPI.RectImage;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.*;
 
+import org.jhotdraw.samples.svg.bridge.EllipseImageBridge;
 import org.jhotdraw.samples.svg.bridge.RectImageBridge;
 import org.jhotdraw.util.*;
 
@@ -244,22 +245,8 @@ public class SVGImageFigure extends SVGAttributedFigure implements SVGFigure, Im
     // EDITING
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
-        switch (detailLevel % 2) {
-            case -1: // Mouse hover handles
-                handles.add(new BoundsOutlineHandle(this, false, true));
-                break;
-            case 0:
-                ResizeHandleKit.addResizeHandles(this, handles);
-                handles.add(new LinkHandle(this));
-                break;
-            case 1:
-                TransformHandleKit.addTransformHandles(this, handles);
-                break;
-            default:
-                break;
-        }
-        return handles;
+        EllipseImageBridge ellipseImageBridge = new EllipseImageBridge();
+        return ellipseImageBridge.createHandles(detailLevel, this);
     }
 
     @Override
