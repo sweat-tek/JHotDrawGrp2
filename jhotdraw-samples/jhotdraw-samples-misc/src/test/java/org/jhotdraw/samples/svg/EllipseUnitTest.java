@@ -25,7 +25,7 @@ public class EllipseUnitTest {
          */
         ellipse = new SVGEllipseFigure();
         tx = new AffineTransform();
-        ellipse.setBounds(new Point2D.Double(0, 0), new Point2D.Double(20, 20));
+        ellipse.setBounds(new Point2D.Double(0,0),new Point2D.Double(20,20));
     }
 
     @Test
@@ -42,8 +42,8 @@ public class EllipseUnitTest {
         Assert.assertTrue(bounds.x == -10 && bounds.y == -10);
     }
 
-    private void moveEllipse(double x, double y) {
-        tx.translate(x, y);
+    private void moveEllipse(double x,double y) {
+        tx.translate(x,y);
         ellipse.transform(tx);
     }
 
