@@ -16,6 +16,7 @@ import org.jhotdraw.samples.bridge.EllipseBridge;
 import org.jhotdraw.samples.svg.bridge.EllipseImageBridge;
 import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.svg.figures.drawing.EllipseShapeRenderer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -39,6 +40,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
+    private final EllipseShapeRenderer ellipseShapeRenderer;
     /**
      * This is used to perform faster drawing and hit testing.
      */
@@ -61,6 +63,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
+        ellipseShapeRenderer = new EllipseShapeRenderer();
         this.ellipseRectangleBridge = new EllipseRectangleBridge();
         this.ellipseBridge = new EllipseBridge();
         SVGAttributeKeys.setDefaults(this);
@@ -70,16 +73,12 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     // DRAWING
     @Override
     protected void drawFill(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.fill(ellipse);
-        }
+        ellipseShapeRenderer.drawFill(g, ellipse);
     }
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.draw(ellipse);
-        }
+        ellipseShapeRenderer.drawStroke(g, ellipse);
     }
 
     // SHAPE AND BOUNDS
