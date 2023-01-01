@@ -16,7 +16,6 @@ public class EllipseUnitTest {
     private Ellipse ellipse;
     private AffineTransform tx;
 
-
     //Creating an ellipse at (0,0) with width 20 and height 20
     @Before
     public void setUp() {
@@ -46,6 +45,4 @@ public class EllipseUnitTest {
         tx.translate(x, y);
         ellipse.transform(tx);
     }
-
-
 }

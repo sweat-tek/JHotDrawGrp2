@@ -6,9 +6,9 @@ import org.junit.Test;
 
 public class MoveEllipseUseCaseTest extends AbstractMoveFigureUseCase<Ellipse>{
 
-
     @Test
     public void moveEllipseTest(){
         super.moveFigure(new SVGEllipseFigure());
     }
+
 }
