@@ -19,9 +19,6 @@ public class EllipseUnitTest {
     //Creating an ellipse at (0,0) with width 20 and height 20
     @Before
     public void setUp() {
-        /**
-         * Instantiate a 10x10 rectangle for testing.
-         */
         ellipse = new SVGEllipseFigure();
         tx = new AffineTransform();
         ellipse.setBounds(new Point2D.Double(0, 0), new Point2D.Double(20, 20));

@@ -1,0 +1,83 @@
+{
+  "className": "org.jhotdraw.samples.svg.MoveEllipseUseCaseTest",
+  "name": "Move Ellipse Use Case",
+  "scenarios": [
+    {
+      "className": "org.jhotdraw.samples.svg.MoveEllipseUseCaseTest",
+      "testMethodName": "moveEllipseTest",
+      "description": "Move ellipse test",
+      "tagIds": [],
+      "explicitParameters": [],
+      "derivedParameters": [],
+      "scenarioCases": [
+        {
+          "caseNr": 1,
+          "steps": [
+            {
+              "name": "provide figure",
+              "words": [
+                {
+                  "value": "Given",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "provide figure"
+                },
+                {
+                  "value": "SVGEllipseFigure@1962398162",
+                  "argumentInfo": {
+                    "argumentName": "figure",
+                    "formattedValue": "SVGEllipseFigure@1962398162"
+                  }
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 7114389,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "moving figure",
+              "words": [
+                {
+                  "value": "When",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "moving figure"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 603114,
+              "depth": 0,
+              "parentFailed": false
+            },
+            {
+              "name": "figure has moved",
+              "words": [
+                {
+                  "value": "Then",
+                  "isIntroWord": true
+                },
+                {
+                  "value": "figure has moved"
+                }
+              ],
+              "status": "PASSED",
+              "durationInNanos": 466919,
+              "depth": 0,
+              "parentFailed": false
+            }
+          ],
+          "explicitArguments": [],
+          "derivedArguments": [],
+          "status": "SUCCESS",
+          "durationInNanos": 642978652
+        }
+      ],
+      "casesAsTable": false,
+      "durationInNanos": 642978652
+    }
+  ],
+  "tagMap": {}
+}

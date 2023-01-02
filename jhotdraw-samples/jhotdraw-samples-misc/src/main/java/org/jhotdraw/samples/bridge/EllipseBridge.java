@@ -15,11 +15,11 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
 
 public class EllipseBridge {
 
-    public void transform(AffineTransform tx, Ellipse ellipseFigure, AbstractFigure abstractFigure) {
+    public void transform(AffineTransform tx, Ellipse ellipseFigure) {
         if (shouldTransformEllipseFigure(ellipseFigure, tx)) {
             transformEllipseFigure(ellipseFigure, tx);
         } else {
-            setEllipseFigureBounds(ellipseFigure, abstractFigure, tx);
+            setEllipseFigureBounds(ellipseFigure, tx);
             transformFillGradient(ellipseFigure, tx);
             transformStrokeGradient(ellipseFigure, tx);
         }
@@ -41,9 +41,9 @@ public class EllipseBridge {
         }
     }
 
-    private void setEllipseFigureBounds(Ellipse ellipseFigure, AbstractFigure abstractFigure, AffineTransform tx) {
-        Point2D.Double anchor = abstractFigure.getStartPoint();
-        Point2D.Double lead = abstractFigure.getEndPoint();
+    private void setEllipseFigureBounds(Ellipse ellipseFigure, AffineTransform tx) {
+        Point2D.Double anchor = ellipseFigure.getStartPoint();
+        Point2D.Double lead = ellipseFigure.getEndPoint();
         ellipseFigure.setBounds(
                 (Point2D.Double) tx.transform(anchor, anchor),
                 (Point2D.Double) tx.transform(lead, lead));

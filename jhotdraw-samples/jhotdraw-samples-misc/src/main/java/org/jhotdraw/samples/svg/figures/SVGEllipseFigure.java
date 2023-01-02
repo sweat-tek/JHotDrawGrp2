@@ -64,8 +64,8 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
         ellipseShapeRenderer = new EllipseShapeRenderer();
-        this.ellipseRectangleBridge = new EllipseRectangleBridge();
-        this.ellipseBridge = new EllipseBridge();
+        ellipseRectangleBridge = new EllipseRectangleBridge();
+        ellipseBridge = new EllipseBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -159,7 +159,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @Override
     @FeatureEntryPoint("EllipseTransform")
     public void transform(AffineTransform tx) {
-        ellipseBridge.transform(tx, this, this);
+        ellipseBridge.transform(tx, this);
     }
 
     @Override
