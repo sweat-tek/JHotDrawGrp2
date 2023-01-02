@@ -9,15 +9,14 @@ package org.jhotdraw.samples.svg.figures;
 
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.AttributeKeys;
-import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
-import org.jhotdraw.draw.handle.ResizeHandleKit;
-import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
-import org.jhotdraw.samples.adapter.SharedAdapter;
-import org.jhotdraw.samples.svg.Gradient;
+import org.jhotdraw.samples.SPI.Ellipse;
+import org.jhotdraw.samples.bridge.EllipseBridge;
+import org.jhotdraw.samples.svg.bridge.EllipseImageBridge;
+import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
-import org.jhotdraw.samples.util.SharedUtil;
+import org.jhotdraw.samples.svg.figures.drawing.EllipseShapeRenderer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -25,7 +24,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
@@ -37,20 +35,23 @@ import static org.jhotdraw.samples.svg.SVGAttributeKeys.STROKE_GRADIENT;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, SharedAdapter {
+
+public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, Ellipse {
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
+    private final EllipseShapeRenderer ellipseShapeRenderer;
     /**
      * This is used to perform faster drawing and hit testing.
      */
-    private transient Shape cachedTransformedShape;
+    private transient java.awt.Shape cachedTransformedShape;
     /**
      * This is used to perform faster hit testing.
      */
-    private transient Shape cachedHitShape;
+    private transient java.awt.Shape cachedHitShape;
+    private final EllipseRectangleBridge ellipseRectangleBridge;
 
-    private final SharedUtil sharedUtil;
+    private final EllipseBridge ellipseBridge;
 
     /**
      * Creates a new instance.
@@ -62,7 +63,9 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
-        this.sharedUtil = new SharedUtil();
+        ellipseShapeRenderer = new EllipseShapeRenderer();
+        ellipseRectangleBridge = new EllipseRectangleBridge();
+        ellipseBridge = new EllipseBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -70,16 +73,12 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     // DRAWING
     @Override
     protected void drawFill(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.fill(ellipse);
-        }
+        ellipseShapeRenderer.drawFill(g, ellipse);
     }
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.draw(ellipse);
-        }
+        ellipseShapeRenderer.drawStroke(g, ellipse);
     }
 
     // SHAPE AND BOUNDS
@@ -140,7 +139,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     }
 
     private Shape getHitShape() {
-        return sharedUtil.getHitShape(cachedHitShape, this, this);
+        return ellipseRectangleBridge.getHitShape(cachedHitShape, this, this);
     }
 
     @Override
@@ -160,45 +159,12 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @Override
     @FeatureEntryPoint("EllipseTransform")
     public void transform(AffineTransform tx) {
-        if (get(TRANSFORM) != null
-                || (tx.getType() & (AffineTransform.TYPE_TRANSLATION)) != tx.getType()) {
-            if (get(TRANSFORM) == null) {
-                TRANSFORM.setClone(this, tx);
-            } else {
-                AffineTransform t = TRANSFORM.getClone(this);
-                t.preConcatenate(tx);
-                set(TRANSFORM, t);
-            }
-        } else {
-            Point2D.Double anchor = getStartPoint();
-            Point2D.Double lead = getEndPoint();
-            setBounds(
-                    (Point2D.Double) tx.transform(anchor, anchor),
-                    (Point2D.Double) tx.transform(lead, lead));
-            if (get(FILL_GRADIENT) != null
-                    && !get(FILL_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = FILL_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(FILL_GRADIENT, g);
-            }
-            if (get(STROKE_GRADIENT) != null
-                    && !get(STROKE_GRADIENT).isRelativeToFigureBounds()) {
-                Gradient g = STROKE_GRADIENT.getClone(this);
-                g.transform(tx);
-                set(STROKE_GRADIENT, g);
-            }
-        }
-        invalidate();
+        ellipseBridge.transform(tx, this);
     }
 
     @Override
     public void restoreTransformTo(Object geometry) {
-        Object[] restoreData = (Object[]) geometry;
-        ellipse = (Ellipse2D.Double) ((Ellipse2D.Double) restoreData[0]).clone();
-        TRANSFORM.setClone(this, (AffineTransform) restoreData[1]);
-        FILL_GRADIENT.setClone(this, (Gradient) restoreData[2]);
-        STROKE_GRADIENT.setClone(this, (Gradient) restoreData[3]);
-        invalidate();
+        ellipseBridge.restoreTransformTo(geometry, this, ellipse);
     }
 
     @Override
@@ -214,22 +180,8 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     // EDITING
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
-        switch (detailLevel % 2) {
-            case -1: // Mouse hover handles
-                handles.add(new BoundsOutlineHandle(this, false, true));
-                break;
-            case 0:
-                ResizeHandleKit.addResizeHandles(this, handles);
-                handles.add(new LinkHandle(this));
-                break;
-            case 1:
-                TransformHandleKit.addTransformHandles(this, handles);
-                break;
-            default:
-                break;
-        }
-        return handles;
+        EllipseImageBridge ellipseImageBridge = new EllipseImageBridge();
+        return ellipseImageBridge.createHandles(detailLevel, this);
     }
 
     // CONNECTING
