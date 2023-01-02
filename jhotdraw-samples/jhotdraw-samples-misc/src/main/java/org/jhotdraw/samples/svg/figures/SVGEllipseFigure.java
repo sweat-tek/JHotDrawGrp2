@@ -9,15 +9,14 @@ package org.jhotdraw.samples.svg.figures;
 
 import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.AttributeKeys;
-import org.jhotdraw.draw.handle.BoundsOutlineHandle;
 import org.jhotdraw.draw.handle.Handle;
-import org.jhotdraw.draw.handle.ResizeHandleKit;
-import org.jhotdraw.draw.handle.TransformHandleKit;
 import org.jhotdraw.geom.Geom;
 import org.jhotdraw.samples.SPI.Ellipse;
 import org.jhotdraw.samples.bridge.EllipseBridge;
+import org.jhotdraw.samples.svg.bridge.EllipseImageBridge;
 import org.jhotdraw.samples.svg.bridge.EllipseRectangleBridge;
 import org.jhotdraw.samples.svg.SVGAttributeKeys;
+import org.jhotdraw.samples.svg.figures.drawing.EllipseShapeRenderer;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -25,7 +24,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import static org.jhotdraw.draw.AttributeKeys.TRANSFORM;
 import static org.jhotdraw.samples.svg.SVGAttributeKeys.FILL_GRADIENT;
@@ -42,6 +40,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
 
     private static final long serialVersionUID = 1L;
     private Ellipse2D.Double ellipse;
+    private final EllipseShapeRenderer ellipseShapeRenderer;
     /**
      * This is used to perform faster drawing and hit testing.
      */
@@ -64,8 +63,9 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @FeatureEntryPoint("EllipseConstructor")
     public SVGEllipseFigure(double x, double y, double width, double height) {
         ellipse = new Ellipse2D.Double(x, y, width, height);
-        this.ellipseRectangleBridge = new EllipseRectangleBridge();
-        this.ellipseBridge = new EllipseBridge();
+        ellipseShapeRenderer = new EllipseShapeRenderer();
+        ellipseRectangleBridge = new EllipseRectangleBridge();
+        ellipseBridge = new EllipseBridge();
         SVGAttributeKeys.setDefaults(this);
         setConnectable(false);
     }
@@ -73,16 +73,12 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     // DRAWING
     @Override
     protected void drawFill(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.fill(ellipse);
-        }
+        ellipseShapeRenderer.drawFill(g, ellipse);
     }
 
     @Override
     protected void drawStroke(Graphics2D g) {
-        if (ellipse.width > 0 && ellipse.height > 0) {
-            g.draw(ellipse);
-        }
+        ellipseShapeRenderer.drawStroke(g, ellipse);
     }
 
     // SHAPE AND BOUNDS
@@ -163,7 +159,7 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     @Override
     @FeatureEntryPoint("EllipseTransform")
     public void transform(AffineTransform tx) {
-        ellipseBridge.transform(tx, this, this);
+        ellipseBridge.transform(tx, this);
     }
 
     @Override
@@ -184,22 +180,8 @@ public class SVGEllipseFigure extends SVGAttributedFigure implements SVGFigure, 
     // EDITING
     @Override
     public Collection<Handle> createHandles(int detailLevel) {
-        LinkedList<Handle> handles = new LinkedList<Handle>();
-        switch (detailLevel % 2) {
-            case -1: // Mouse hover handles
-                handles.add(new BoundsOutlineHandle(this, false, true));
-                break;
-            case 0:
-                ResizeHandleKit.addResizeHandles(this, handles);
-                handles.add(new LinkHandle(this));
-                break;
-            case 1:
-                TransformHandleKit.addTransformHandles(this, handles);
-                break;
-            default:
-                break;
-        }
-        return handles;
+        EllipseImageBridge ellipseImageBridge = new EllipseImageBridge();
+        return ellipseImageBridge.createHandles(detailLevel, this);
     }
 
     // CONNECTING

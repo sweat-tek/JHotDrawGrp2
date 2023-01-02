@@ -151,7 +151,7 @@ public class ODGEllipseFigure extends ODGAttributedFigure implements ODGFigure, 
      */
     @Override
     public void transform(AffineTransform tx) {
-        ellipseBridge.transform(tx, this, this);
+        ellipseBridge.transform(tx, this);
     }
 
     @Override
