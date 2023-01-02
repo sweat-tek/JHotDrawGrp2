@@ -1,6 +1,5 @@
 package org.jhotdraw.samples.bridge;
 
-import org.jhotdraw.draw.figure.AbstractFigure;
 import org.jhotdraw.draw.figure.Figure;
 import org.jhotdraw.samples.SPI.Ellipse;
 import org.jhotdraw.samples.svg.Gradient;
