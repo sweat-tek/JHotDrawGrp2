@@ -19,7 +19,7 @@ public class ImageToolTest {
     public void setUp() {
         imageFigure = new SVGImageFigure();
         tx = new AffineTransform();
-        imageFigure.setBounds(new Point2D.Double(0,0), new Point2D.Double(20,20));
+        imageFigure.setBounds(new Point2D.Double(0, 0), new Point2D.Double(20, 20));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ImageToolTest {
     }
 
     private void moveImage(double x, double y) {
-        tx.translate(x,y);
+        tx.translate(x, y);
         imageFigure.transform(tx);
     }
 }
